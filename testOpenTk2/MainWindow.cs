@@ -25,6 +25,21 @@ class MainWindow : GameWindow
             GraphicsContextFlags.ForwardCompatible)
     {
         m_titlePrefix = "dreamstatecoding" + ": OpenGL Version: " + GL.GetString(StringName.Version);
+        
+        string Version = GL.GetString(StringName.Version);
+        Console.WriteLine("Version " + Version);
+        string Vendor = GL.GetString(StringName.Vendor);
+        Console.WriteLine("Vendor " + Vendor);
+        string ShadingLanguageVersion = GL.GetString(StringName.ShadingLanguageVersion);
+        Console.WriteLine("ShadingLanguageVersion " + ShadingLanguageVersion);
+        string Renderer = GL.GetString(StringName.Renderer);
+        Console.WriteLine("Renderer " + Renderer);
+        string Extensions = GL.GetString(StringName.Extensions);
+        string[] ExtensionsArray = Extensions.Split(' ');
+        foreach(var iter in ExtensionsArray)
+        {
+            Console.WriteLine("Extensions " + iter);
+        }
     }
 
     protected override void OnResize(EventArgs e)
