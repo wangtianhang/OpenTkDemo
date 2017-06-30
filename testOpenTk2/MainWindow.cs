@@ -22,7 +22,7 @@ void main(void)
 {
     const vec4 vertices[3] = vec4[3](vec4(0.25, -0.25, 0.5, 1.0),
     vec4(-0.25, -0.25, 0.5, 1.0),
-    vec4(0.25, -0.25, 0.5, 1.0));
+    vec4(0.25, 0.25, 0.5, 1.0));
 
     gl_Position = vertices[gl_VertexID];
 }
@@ -84,6 +84,7 @@ void main(void)
         vertexShader = GL.CreateShader(ShaderType.VertexShader);
         GL.ShaderSource(vertexShader, m_vertexShaderSrc);
         GL.CompileShader(vertexShader);
+        
         int length = 0;
         GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out length);
         string errorInfo = GL.GetShaderInfoLog(vertexShader);
@@ -92,6 +93,7 @@ void main(void)
         pixelShader = GL.CreateShader(ShaderType.FragmentShader);
         GL.ShaderSource(pixelShader, m_pixelShaderSrc);
         GL.CompileShader(pixelShader);
+
         GL.GetShader(pixelShader, ShaderParameter.CompileStatus, out length);
         errorInfo = GL.GetShaderInfoLog(pixelShader);
         Console.WriteLine("pixelShader " + errorInfo + " " + length);
@@ -100,6 +102,7 @@ void main(void)
         GL.AttachShader(shaderProgram, vertexShader);
         GL.AttachShader(shaderProgram, pixelShader);
         GL.LinkProgram(shaderProgram);
+
         GL.GetProgram(shaderProgram, GetProgramParameterName.LinkStatus, out length);
         errorInfo = GL.GetProgramInfoLog(shaderProgram);
         Console.WriteLine("shaderProgram " + errorInfo + " " + length);
