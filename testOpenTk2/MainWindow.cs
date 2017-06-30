@@ -12,10 +12,30 @@ using OpenTK.Input;
 class MainWindow : GameWindow
 {
     string m_titlePrefix = null;
+    float m_totalTime = 0;
+    int m_renderPorgram = 0;
+    int m_vertexArrayObject = 0;
+
+    const string m_vertexShaderSrc = @"
+#version 430 core
+void main(void)
+{
+    gl_Position = vec4(0.0, 0.0, 0.5, 1.0);
+}
+";
+
+    const string m_pixelShaderSrc = @"
+#version 430 core
+out vec4 color;
+void mian(void)
+{
+    color = vec4(0.0, 0.8, 1.0, 1.0f);
+}
+";
 
     public MainWindow()
-        : base(1280, // initial width
-            720, // initial height
+        : base(800, // initial width
+            600, // initial height
             GraphicsMode.Default,
             "dreamstatecoding",  // initial title
             GameWindowFlags.Default,
@@ -25,7 +45,16 @@ class MainWindow : GameWindow
             GraphicsContextFlags.ForwardCompatible)
     {
         m_titlePrefix = "dreamstatecoding" + ": OpenGL Version: " + GL.GetString(StringName.Version);
-        
+
+        LogInfo();
+
+        m_renderPorgram = CompilerShader();
+        m_vertexArrayObject = GL.GenVertexArray();
+        GL.BindVertexArray(m_vertexArrayObject);
+    }
+
+    void LogInfo()
+    {
         string Version = GL.GetString(StringName.Version);
         Console.WriteLine("Version " + Version);
         string Vendor = GL.GetString(StringName.Vendor);
@@ -36,10 +65,35 @@ class MainWindow : GameWindow
         Console.WriteLine("Renderer " + Renderer);
         string Extensions = GL.GetString(StringName.Extensions);
         string[] ExtensionsArray = Extensions.Split(' ');
-        foreach(var iter in ExtensionsArray)
+        foreach (var iter in ExtensionsArray)
         {
             Console.WriteLine("Extensions " + iter);
         }
+    }
+
+    int CompilerShader()
+    {
+        int vertexShader = 0;
+        int pixelShader = 0;
+        int shaderProgram = 0;
+
+        vertexShader = GL.CreateShader(ShaderType.VertexShader);
+        GL.ShaderSource(vertexShader, m_vertexShaderSrc);
+        GL.CompileShader(vertexShader);
+
+        pixelShader = GL.CreateShader(ShaderType.FragmentShader);
+        GL.ShaderSource(pixelShader, m_pixelShaderSrc);
+        GL.CompileShader(pixelShader);
+
+        shaderProgram = GL.CreateProgram();
+        GL.AttachShader(shaderProgram, vertexShader);
+        GL.AttachShader(shaderProgram, pixelShader);
+        GL.LinkProgram(shaderProgram);
+
+        GL.DeleteShader(vertexShader);
+        GL.DeleteShader(pixelShader);
+
+        return shaderProgram;
     }
 
     protected override void OnResize(EventArgs e)
@@ -71,13 +125,24 @@ class MainWindow : GameWindow
         //Title = $"(Vsync: {VSync}) FPS: {1f / e.Time:0}";
         Title = m_titlePrefix + " Vsync " + VSync + " FPS " + (1 / e.Time).ToString("f0");
 
-        Color4 backColor;
-        backColor.A = 1.0f;
-        backColor.R = 0.1f;
-        backColor.G = 0.1f;
-        backColor.B = 0.3f;
-        GL.ClearColor(backColor);
-        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        //Color4 backColor;
+        //backColor.A = 1.0f;
+        //backColor.R = 0.1f;
+        //backColor.G = 0.1f;
+        //backColor.B = 0.3f;
+        //GL.ClearColor(backColor);
+        //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        
+        //float[] color = new float[] { 1.0f, 0.0f, 0.0f, 1.0f};
+        m_totalTime += (float)e.Time;
+        float[] color = new float[] {(float)Math.Sin(m_totalTime) * 0.5f + 0.5f, 
+        (float)Math.Cos(m_totalTime) * 0.5f + 0.5f,
+        0, 1.0f};
+        GL.ClearBuffer(ClearBuffer.Color, 0, color);
+
+        GL.UseProgram(m_renderPorgram);
+        GL.PointSize(40);
+        GL.DrawArrays(PrimitiveType.Points, 0, 1);
 
         SwapBuffers();
     }
