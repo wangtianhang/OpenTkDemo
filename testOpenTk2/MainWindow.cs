@@ -20,14 +20,18 @@ class MainWindow : GameWindow
 #version 430 core
 void main(void)
 {
-    gl_Position = vec4(0.0, 0.0, 0.5, 1.0);
+    const vec4 vertices[3] = vec4[3](vec4(0.25, -0.25, 0.5, 1.0),
+    vec4(-0.25, -0.25, 0.5, 1.0),
+    vec4(0.25, -0.25, 0.5, 1.0));
+
+    gl_Position = vertices[gl_VertexID];
 }
 ";
 
     const string m_pixelShaderSrc = @"
 #version 430 core
 out vec4 color;
-void mian(void)
+void main(void)
 {
     color = vec4(0.0, 0.8, 1.0, 1.0f);
 }
@@ -80,15 +84,25 @@ void mian(void)
         vertexShader = GL.CreateShader(ShaderType.VertexShader);
         GL.ShaderSource(vertexShader, m_vertexShaderSrc);
         GL.CompileShader(vertexShader);
+        int length = 0;
+        GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out length);
+        string errorInfo = GL.GetShaderInfoLog(vertexShader);
+        Console.WriteLine("vertexShader " + errorInfo + " " + length);
 
         pixelShader = GL.CreateShader(ShaderType.FragmentShader);
         GL.ShaderSource(pixelShader, m_pixelShaderSrc);
         GL.CompileShader(pixelShader);
+        GL.GetShader(pixelShader, ShaderParameter.CompileStatus, out length);
+        errorInfo = GL.GetShaderInfoLog(pixelShader);
+        Console.WriteLine("pixelShader " + errorInfo + " " + length);
 
         shaderProgram = GL.CreateProgram();
         GL.AttachShader(shaderProgram, vertexShader);
         GL.AttachShader(shaderProgram, pixelShader);
         GL.LinkProgram(shaderProgram);
+        GL.GetProgram(shaderProgram, GetProgramParameterName.LinkStatus, out length);
+        errorInfo = GL.GetProgramInfoLog(shaderProgram);
+        Console.WriteLine("shaderProgram " + errorInfo + " " + length);
 
         GL.DeleteShader(vertexShader);
         GL.DeleteShader(pixelShader);
@@ -141,8 +155,9 @@ void mian(void)
         GL.ClearBuffer(ClearBuffer.Color, 0, color);
 
         GL.UseProgram(m_renderPorgram);
-        GL.PointSize(40);
-        GL.DrawArrays(PrimitiveType.Points, 0, 1);
+        //GL.PointSize(40);
+        //GL.DrawArrays(PrimitiveType.Points, 0, 1);
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
         SwapBuffers();
     }
