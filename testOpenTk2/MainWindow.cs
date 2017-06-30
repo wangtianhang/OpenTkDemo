@@ -18,13 +18,14 @@ class MainWindow : GameWindow
 
     const string m_vertexShaderSrc = @"
 #version 430 core
+layout(location = 0) in vec4 offset;
 void main(void)
 {
     const vec4 vertices[3] = vec4[3](vec4(0.25, -0.25, 0.5, 1.0),
     vec4(-0.25, -0.25, 0.5, 1.0),
     vec4(0.25, 0.25, 0.5, 1.0));
 
-    gl_Position = vertices[gl_VertexID];
+    gl_Position = vertices[gl_VertexID] + offset;
 }
 ";
 
@@ -160,6 +161,12 @@ void main(void)
         GL.UseProgram(m_renderPorgram);
         //GL.PointSize(40);
         //GL.DrawArrays(PrimitiveType.Points, 0, 1);
+        float[] attrib = new float[] { (float)Math.Sin(m_totalTime) * 0.5f, 
+        (float)Math.Cos(m_totalTime) * 0.6f, 
+        0.0f, 0.0f};
+
+        GL.VertexAttrib4(0, attrib);
+
         GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
         SwapBuffers();
