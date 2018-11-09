@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace testOpenTk2
 {
@@ -20,8 +21,19 @@ namespace testOpenTk2
         static void Main()
         {
             AllocConsole();
-
+            //ShowSecondWindow();
             new MainWindow().Run(60);
+        }
+
+        static void ShowSecondWindow()
+        {
+            Thread thread = new Thread(SecondWindowThread);
+            thread.Start();    
+        }
+
+        static void SecondWindowThread()
+        {
+            new MainWindow().Run();
         }
     }
 }
