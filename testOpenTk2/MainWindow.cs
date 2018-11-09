@@ -136,6 +136,12 @@ void main(void)
         {
             Exit();
         }
+
+        MouseState mouseState = Mouse.GetState();
+        if(mouseState.IsButtonDown(MouseButton.Left))
+        {
+            //Console.WriteLine("mouse left btn down");
+        }
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
