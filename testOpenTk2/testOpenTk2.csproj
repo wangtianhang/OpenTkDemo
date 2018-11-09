@@ -58,7 +58,11 @@
     <Compile Include="unityMath\Vector2.cs" />
     <Compile Include="unityMath\Vector3.cs" />
     <Compile Include="unityMath\Vector4.cs" />
+    <Compile Include="unity\Coroutine.cs" />
     <Compile Include="unity\Debug.cs" />
+    <Compile Include="unity\GameObject.cs" />
+    <Compile Include="unity\MeshFilter.cs" />
+    <Compile Include="unity\Transform.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
