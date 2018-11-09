@@ -63,6 +63,7 @@
     <Compile Include="unity\Color.cs" />
     <Compile Include="unity\Color32.cs" />
     <Compile Include="unity\component\Behaviour.cs" />
+    <Compile Include="unity\component\Camera.cs" />
     <Compile Include="unity\component\Component.cs" />
     <Compile Include="unity\component\Light.cs" />
     <Compile Include="unity\component\MeshFilter.cs" />
