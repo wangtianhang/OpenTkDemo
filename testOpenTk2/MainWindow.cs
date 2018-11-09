@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
+using OpenTK.Graphics.ES30;
 using OpenTK.Input;
 
 using UnityEngine;
