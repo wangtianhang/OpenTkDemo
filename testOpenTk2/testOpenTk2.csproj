@@ -58,11 +58,20 @@
     <Compile Include="unityMath\Vector2.cs" />
     <Compile Include="unityMath\Vector3.cs" />
     <Compile Include="unityMath\Vector4.cs" />
+    <Compile Include="unity\Application.cs" />
+    <Compile Include="unity\Color.cs" />
+    <Compile Include="unity\Color32.cs" />
+    <Compile Include="unity\component\Behaviour.cs" />
+    <Compile Include="unity\component\Component.cs" />
+    <Compile Include="unity\component\MonoBehaviour.cs" />
     <Compile Include="unity\Coroutine.cs" />
     <Compile Include="unity\Debug.cs" />
-    <Compile Include="unity\GameObject.cs" />
-    <Compile Include="unity\MeshFilter.cs" />
-    <Compile Include="unity\Transform.cs" />
+    <Compile Include="unity\inner\GoManager.cs" />
+    <Compile Include="unity\inner\MonoManager.cs" />
+    <Compile Include="unity\obj\GameObject.cs" />
+    <Compile Include="unity\obj\Mesh.cs" />
+    <Compile Include="unity\obj\Object.cs" />
+    <Compile Include="unity\component\Transform.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -9,6 +9,8 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 
+using UnityEngine;
+
 class MainWindow : GameWindow
 {
     string m_titlePrefix = null;
@@ -56,6 +58,15 @@ void main(void)
         m_renderPorgram = CompilerShader();
         m_vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(m_vertexArrayObject);
+
+        Application._Init();
+
+        InitScene();
+    }
+
+    void InitScene()
+    {
+
     }
 
     void LogInfo()
