@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="demo\Demo.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="unity\Debug.cs" />
     <Compile Include="unity\inner\GoManager.cs" />
     <Compile Include="unity\inner\MonoManager.cs" />
+    <Compile Include="unity\obj\Shader.cs" />
     <Compile Include="unity\obj\GameObject.cs" />
     <Compile Include="unity\obj\Mesh.cs" />
     <Compile Include="unity\obj\Object.cs" />
