@@ -64,11 +64,15 @@
     <Compile Include="unity\Color32.cs" />
     <Compile Include="unity\component\Behaviour.cs" />
     <Compile Include="unity\component\Component.cs" />
+    <Compile Include="unity\component\Light.cs" />
+    <Compile Include="unity\component\MeshFilter.cs" />
+    <Compile Include="unity\component\MeshRenderer.cs" />
     <Compile Include="unity\component\MonoBehaviour.cs" />
     <Compile Include="unity\Coroutine.cs" />
     <Compile Include="unity\Debug.cs" />
     <Compile Include="unity\inner\GoManager.cs" />
     <Compile Include="unity\inner\MonoManager.cs" />
+    <Compile Include="unity\obj\Material.cs" />
     <Compile Include="unity\obj\Shader.cs" />
     <Compile Include="unity\obj\GameObject.cs" />
     <Compile Include="unity\obj\Mesh.cs" />
