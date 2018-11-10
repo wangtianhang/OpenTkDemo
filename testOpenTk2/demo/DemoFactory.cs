@@ -10,6 +10,7 @@ public enum DemoType
     None,
     OpenGLTriangle,
     FakeUnity,
+    VADemo,
 }
 
 public interface IDemo
@@ -33,6 +34,10 @@ class DemoFactory
         else if (DemoConfig.m_demoType == DemoType.FakeUnity)
         {
             return new UnityEngine.Application();
+        }
+        else if (DemoConfig.m_demoType == DemoType.VADemo)
+        {
+            return new VADemo();
         }
         else
         {

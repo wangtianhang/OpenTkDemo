@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 class DemoConfig
 {
-    public static DemoType m_demoType = DemoType.OpenGLTriangle;
+    public static DemoType m_demoType = DemoType.VADemo;
 }
 
