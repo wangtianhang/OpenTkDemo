@@ -13,11 +13,16 @@ using UnityEngine;
 
 class MainWindow : GameWindow
 {
-    
-    
+    public enum DemoType
+    {
+        None,
+        OpenGLTriangle,
+        FakeUnity,
+    }
 
     Application m_application = null;
-    Demo2 m_demo = null;
+    OpenGLTriangleDemo m_demo = null;
+
 
     public MainWindow()
         : base(800, // initial width
@@ -34,12 +39,22 @@ class MainWindow : GameWindow
 
         LogInfo();
 
-        m_application = new Application();
-        m_application._Init(this);
+        CreateDemo(DemoType.OpenGLTriangle);
+    }
 
-        //Demo.LoadScene();
-        m_demo = new Demo2();
-        m_demo.LoadScene();
+    void CreateDemo(DemoType demoType)
+    {
+
+        if (demoType == DemoType.OpenGLTriangle)
+        {
+            m_demo = new OpenGLTriangleDemo();
+            m_demo.Init(this);
+        }
+        else if (demoType == DemoType.FakeUnity)
+        {
+            m_application = new Application();
+            m_application._Init(this);
+        }
     }
 
 //     void InitScene()
@@ -77,13 +92,25 @@ class MainWindow : GameWindow
 
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
-        m_application.OnUpdateFrame(e);
+        if (m_application != null)
+        {
+            m_application.OnUpdateFrame(e);
+        }
+        
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        //m_demo.OnRenderFrame(e);
-        m_application.OnRenderFrame(e);
+        if (m_application != null)
+        {
+            //m_demo.OnRenderFrame(e);
+            m_application.OnRenderFrame(e);
+        }
+        if (m_demo != null)
+        {
+            m_demo.OnRenderFrame(e);
+        }
+        SwapBuffers();
     }
 }
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-class Demo2
+class FakeUnityDemo
 {
     public void LoadScene()
     {

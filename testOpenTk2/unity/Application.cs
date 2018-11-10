@@ -14,6 +14,8 @@ namespace UnityEngine
         MainWindow m_mainWindow = null;
         string m_titlePrefix = null;
 
+        FakeUnityDemo m_demo = null;
+
         //GoManager m_goMgr = null;
         SceneMgr m_sceneMgr = null;
         RenderMgr m_renderMgr = null;
@@ -31,6 +33,9 @@ namespace UnityEngine
 
             m_renderMgr = new RenderMgr();
             m_renderMgr.Init(this);
+
+            m_demo = new FakeUnityDemo();
+            m_demo.LoadScene();
         }
 
         public RenderMgr GetRenderMgr()
@@ -58,7 +63,7 @@ namespace UnityEngine
 
             GL.Finish();
             
-            m_mainWindow.SwapBuffers();
+            //m_mainWindow.SwapBuffers();
         }
 
         void HandleKeyboard()
