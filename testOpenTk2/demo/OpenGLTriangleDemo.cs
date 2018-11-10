@@ -9,7 +9,8 @@ using OpenTK;
 class OpenGLTriangleDemo
 {
     const string m_vertexShaderSrc = @"
-#version 430 core
+#version 300 es
+precision highp float;
 layout(location = 0) in vec4 offset;
 void main(void)
 {
@@ -22,7 +23,8 @@ void main(void)
 ";
 
     const string m_pixelShaderSrc = @"
-#version 430 core
+#version 300 es
+precision highp float;
 out vec4 color;
 void main(void)
 {
