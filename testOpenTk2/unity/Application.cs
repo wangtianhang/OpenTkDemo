@@ -12,29 +12,49 @@ namespace UnityEngine
     class Application
     {
         MainWindow m_mainWindow = null;
-        GoManager m_goMgr = null;
         string m_titlePrefix = null;
+
+        //GoManager m_goMgr = null;
+        SceneMgr m_sceneMgr = null;
+        RenderMgr m_renderMgr = null;
 
         public void _Init(MainWindow mainWindow)
         {
             m_mainWindow = mainWindow;
-            m_goMgr = new GoManager();
             m_titlePrefix = "dreamstatecoding" + ": OpenGL Version: " + GL.GetString(StringName.Version);
+
+            //m_goMgr = new GoManager();
+            //m_goMgr.Init(this);
+
+            m_sceneMgr = new SceneMgr();
+            m_sceneMgr.Init(this);
+
+            m_renderMgr = new RenderMgr();
+            m_renderMgr.Init(this);
         }
 
-        public GoManager _GetGoManager()
+        public RenderMgr GetRenderMgr()
         {
-            return m_goMgr;
+            return m_renderMgr;
         }
+
+//         public GoManager _GetGoManager()
+//         {
+//             return m_goMgr;
+//         }
 
         public void OnUpdateFrame(FrameEventArgs e)
         {
             HandleKeyboard();
+
+            m_sceneMgr.Update();
         }
 
         public void OnRenderFrame(FrameEventArgs e)
         {
             m_mainWindow.Title = m_titlePrefix + " Vsync " + m_mainWindow.VSync + " FPS " + (1 / e.Time).ToString("f0");
+
+            m_sceneMgr.Render();
 
             GL.Finish();
             

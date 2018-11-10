@@ -36,7 +36,7 @@ void main(void)
 
     public void LoadScene()
     {
-        m_renderPorgram = Shader._CompilerShader(m_vertexShaderSrc, m_pixelShaderSrc);
+        m_renderPorgram = OpenGLMgr._CompilerShader(m_vertexShaderSrc, m_pixelShaderSrc);
         m_vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(m_vertexArrayObject);
     }

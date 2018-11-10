@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    public class GoManager
-    {
-
-    }
+//     public class GoManager
+//     {
+//         Application m_application = null;
+//         public void Init(Application application)
+//         {
+//             m_application = application;
+//         }
+//     }
 }
