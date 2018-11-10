@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.ES30;
 using OpenTK;
 
-class OpenGLTriangleDemo
+class OpenGLTriangleDemo : IDemo
 {
     const string m_vertexShaderSrc = @"
 #version 300 es
@@ -45,6 +45,11 @@ void main(void)
         m_renderPorgram = OpenGLMgr._CompilerShader(m_vertexShaderSrc, m_pixelShaderSrc);
         m_vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(m_vertexArrayObject);
+    }
+
+    public void OnUpdateFrame(FrameEventArgs e)
+    {
+        
     }
 
     public void OnRenderFrame(FrameEventArgs e)

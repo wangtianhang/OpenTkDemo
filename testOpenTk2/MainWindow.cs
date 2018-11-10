@@ -11,18 +11,14 @@ using OpenTK.Input;
 
 using UnityEngine;
 
-class MainWindow : GameWindow
+public class MainWindow : GameWindow
 {
-    public enum DemoType
-    {
-        None,
-        OpenGLTriangle,
-        FakeUnity,
-    }
 
-    Application m_application = null;
-    OpenGLTriangleDemo m_demo = null;
 
+    //Application m_application = null;
+    //OpenGLTriangleDemo m_demo = null;
+
+    IDemo m_demo = null;
 
     public MainWindow()
         : base(800, // initial width
@@ -35,27 +31,13 @@ class MainWindow : GameWindow
             0, // OpenGL minor version
             GraphicsContextFlags.ForwardCompatible)
     {
-        
-
         LogInfo();
 
-        CreateDemo(DemoType.OpenGLTriangle);
+        m_demo = DemoFactory.CreateDemo();
+        m_demo.Init(this);
     }
 
-    void CreateDemo(DemoType demoType)
-    {
 
-        if (demoType == DemoType.OpenGLTriangle)
-        {
-            m_demo = new OpenGLTriangleDemo();
-            m_demo.Init(this);
-        }
-        else if (demoType == DemoType.FakeUnity)
-        {
-            m_application = new Application();
-            m_application._Init(this);
-        }
-    }
 
 //     void InitScene()
 //     {
@@ -92,24 +74,26 @@ class MainWindow : GameWindow
 
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
-        if (m_application != null)
-        {
-            m_application.OnUpdateFrame(e);
-        }
-        
+//         if (m_application != null)
+//         {
+//             m_application.OnUpdateFrame(e);
+//         }
+        m_demo.OnUpdateFrame(e);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        if (m_application != null)
-        {
-            //m_demo.OnRenderFrame(e);
-            m_application.OnRenderFrame(e);
-        }
-        if (m_demo != null)
-        {
-            m_demo.OnRenderFrame(e);
-        }
+//         if (m_application != null)
+//         {
+//             //m_demo.OnRenderFrame(e);
+//             m_application.OnRenderFrame(e);
+//         }
+//         if (m_demo != null)
+//         {
+//             m_demo.OnRenderFrame(e);
+//         }
+        m_demo.OnRenderFrame(e);
+
         SwapBuffers();
     }
 }

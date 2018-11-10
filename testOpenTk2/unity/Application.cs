@@ -9,7 +9,7 @@ using OpenTK.Graphics.ES30;
 
 namespace UnityEngine
 {
-    class Application
+    class Application : IDemo
     {
         MainWindow m_mainWindow = null;
         string m_titlePrefix = null;
@@ -20,7 +20,7 @@ namespace UnityEngine
         SceneMgr m_sceneMgr = null;
         RenderMgr m_renderMgr = null;
 
-        public void _Init(MainWindow mainWindow)
+        public void Init(MainWindow mainWindow)
         {
             m_mainWindow = mainWindow;
             m_titlePrefix = "dreamstatecoding" + ": OpenGL Version: " + GL.GetString(StringName.Version);

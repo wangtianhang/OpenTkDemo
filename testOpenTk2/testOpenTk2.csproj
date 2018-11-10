@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="demo\DemoConfig.cs" />
+    <Compile Include="demo\DemoFactory.cs" />
     <Compile Include="demo\OpenGLTriangleDemo.cs" />
     <Compile Include="demo\FakeUnityDemo.cs" />
     <Compile Include="MainWindow.cs" />
@@ -61,8 +63,8 @@
     <Compile Include="unityMath\Vector3.cs" />
     <Compile Include="unityMath\Vector4.cs" />
     <Compile Include="unity\Application.cs" />
-    <Compile Include="unity\Color.cs" />
-    <Compile Include="unity\Color32.cs" />
+    <Compile Include="unity\render\Color.cs" />
+    <Compile Include="unity\render\Color32.cs" />
     <Compile Include="unity\component\Behaviour.cs" />
     <Compile Include="unity\component\Camera.cs" />
     <Compile Include="unity\component\Component.cs" />
