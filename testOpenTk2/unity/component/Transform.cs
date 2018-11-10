@@ -10,13 +10,15 @@ using UnityEngine;
 
 public class Transform : Component
 {
-    Vector3 m_position = Vector3.zero;
+    public Vector3 position = Vector3.zero;
 
     //Vector3 m_localScale;
 
-    Quaternion m_rotation = Quaternion.identity;
+    public Quaternion rotation = Quaternion.identity;
 
-    Vector3 m_scale = Vector3.one;
+    public Vector3 eulerAngles = Vector3.zero;
+
+    public Vector3 scale = Vector3.one;
 
     Transform m_parent = null;
 
@@ -32,7 +34,7 @@ public class Transform : Component
     {
         get 
         {
-            return Matrix4x4.TRS(m_position, m_rotation, m_scale);
+            return Matrix4x4.TRS(position, rotation, scale);
         }
     }
 

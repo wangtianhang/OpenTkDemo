@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    class Camera : Component
+    class Camera : Behaviour
     {
 
     }

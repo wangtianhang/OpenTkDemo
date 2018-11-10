@@ -17,6 +17,16 @@ namespace UnityEngine
             }
         }
 
+        //public GameObject gameObject { get; }
+        Transform m_trasform = null;
+        public Transform transform 
+        { 
+            get
+            {
+                return m_trasform;
+            }
+        }
+
         public T GetComponent<T>() where T : Component
         {
             return gameObject.GetComponent<T>();

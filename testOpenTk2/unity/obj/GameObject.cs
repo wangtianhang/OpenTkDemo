@@ -8,6 +8,13 @@ namespace UnityEngine
 {
     public class GameObject : Object
     {
+        public GameObject(string name)
+        {
+            this.name = name;
+        }
+
+        public Transform transform;
+
         MonoManager m_monoMgr = new MonoManager();
 
         public T AddComponent<T>() where T : Component

@@ -8,6 +8,9 @@ namespace UnityEngine
 {
     public class Mesh : Object
     {
-
+        public Vector3[] vertices { get; set; }
+        public int[] triangles { get; set; }
+        public Vector3[] normals { get; set; }
+        public Color[] colors { get; set; }
     }
 }

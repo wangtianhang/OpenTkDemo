@@ -8,6 +8,6 @@ namespace UnityEngine
 {
     class MeshRenderer : Component
     {
-
+        public Material material { get; set; }
     }
 }

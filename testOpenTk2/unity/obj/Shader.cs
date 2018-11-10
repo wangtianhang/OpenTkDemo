@@ -8,6 +8,26 @@ using OpenTK.Graphics.OpenGL4;
 
 class Shader
 {
+    public string m_vertexShaderSrc;
+    public string m_pixelShaderSrc;
+    
+    public bool m_useZWrite = true;
+    public bool m_useZTest = true;
+    public bool m_useBlend = false;
+
+    public bool m_useCull = true;
+    public bool m_cullBack = true;
+
+    public static Shader Find(string name)
+    {
+        if(name == "Diffuse")
+        {
+
+        }
+
+        return null;
+    }
+
     public static int _CompilerShader(string vertexShaderSrc, string pixelShaderSrc)
     {
         int vertexShader = 0;

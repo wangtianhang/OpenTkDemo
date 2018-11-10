@@ -8,6 +8,9 @@ namespace UnityEngine
 {
     class Material : Object
     {
+        public Material(Shader shader)
+        {
 
+        }
     }
 }

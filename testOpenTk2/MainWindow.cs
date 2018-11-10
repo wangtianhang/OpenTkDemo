@@ -17,7 +17,7 @@ class MainWindow : GameWindow
     
 
     Application m_application = null;
-    Demo m_demo = null;
+    Demo2 m_demo = null;
 
     public MainWindow()
         : base(800, // initial width
@@ -38,7 +38,7 @@ class MainWindow : GameWindow
         m_application._Init(this);
 
         //Demo.LoadScene();
-        m_demo = new Demo();
+        m_demo = new Demo2();
         m_demo.LoadScene();
     }
 
@@ -82,7 +82,7 @@ class MainWindow : GameWindow
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        m_demo.OnRenderFrame(e);
+        //m_demo.OnRenderFrame(e);
         m_application.OnRenderFrame(e);
     }
 }
