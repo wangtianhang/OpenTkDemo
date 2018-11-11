@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 class DemoConfig
 {
-    public static DemoType m_demoType = DemoType.VADemo;
+    public static DemoType m_demoType = DemoType.VBODemo;
 }
 

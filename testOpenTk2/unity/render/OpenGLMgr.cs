@@ -44,5 +44,14 @@ class OpenGLMgr
 
         return shaderProgram;
     }
+
+    public static void CheckGLError()
+    {
+        ErrorCode error = GL.GetError();
+        if (error != ErrorCode.NoError)
+        {
+            Console.WriteLine("CheckGLError " + error);
+        }
+    }
 }
 
