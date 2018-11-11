@@ -92,7 +92,7 @@ void main()
         
         DrawPrimitiveWithVBOs(3, vertices, sizeof(float) * (VERTEX_POS_SIZE + VERTEX_COLOR_SIZE), 3, indices);
 
-        //GL.Finish();
+        GL.Finish();
         //OpenGLMgr.CheckGLError();
     }
 

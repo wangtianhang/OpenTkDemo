@@ -12,6 +12,7 @@ public enum DemoType
     FakeUnity,
     VADemo,
     VBODemo,
+    VAODemo,
 }
 
 public interface IDemo
@@ -43,6 +44,10 @@ class DemoFactory
         else if (DemoConfig.m_demoType == DemoType.VBODemo)
         {
             return new VBODemo();
+        }
+        else if (DemoConfig.m_demoType == DemoType.VAODemo)
+        {
+            return new VAODemo();
         }
         else
         {
