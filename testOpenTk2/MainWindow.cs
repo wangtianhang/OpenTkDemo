@@ -56,10 +56,10 @@ public class MainWindow : GameWindow
         Console.WriteLine("Renderer " + Renderer);
         string Extensions = GL.GetString(StringName.Extensions);
         string[] ExtensionsArray = Extensions.Split(' ');
-        foreach (var iter in ExtensionsArray)
-        {
-            Console.WriteLine("Extensions " + iter);
-        }
+//         foreach (var iter in ExtensionsArray)
+//         {
+//             Console.WriteLine("Extensions " + iter);
+//         }
     }
 
     protected override void OnResize(EventArgs e)

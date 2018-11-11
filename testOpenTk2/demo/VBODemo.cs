@@ -12,8 +12,8 @@ class VBODemo : IDemo
         const string vShaderStr = @"
 #version 300 es
 precision highp float;
-layout(location = 0) in vec4 a_color;
-layout(location = 1) in vec4 a_position;
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec4 a_color;
 uniform float u_offset;
 out vec4 v_color;
 void main()
@@ -67,7 +67,7 @@ void main()
             -0.5f, -0.5f, 0f, // v1
             0f, 1f, 0f, 1f, // c1
             0.5f, -0.5f, 0f, //v2
-            0f, 0f, 1f, 1f, //c2
+            1f, 1f, 1f, 1f, //c2
         };
         ushort[] indices = new ushort[] { 0, 1, 2 };
 
@@ -82,7 +82,7 @@ void main()
         OpenGLMgr.CheckGLError();
         //GL.Uniform1(offsetLoc, 0);
         //DrawPrimitiveWithoutVBOs(vertices, indices);
-        GL.Uniform1(offsetLoc, 0.25f);
+        GL.Uniform1(offsetLoc, 0f);
         OpenGLMgr.CheckGLError();
         
         DrawPrimitiveWithVBOs(3, vertices, sizeof(float) * (VERTEX_POS_SIZE + VERTEX_COLOR_SIZE), 3, indices);
@@ -125,21 +125,21 @@ void main()
         {
             GL.GenBuffers(2, m_vboBuff);
             OpenGLMgr.CheckGLError();
-            
-            GL.BindBuffer(All.ArrayBuffer, m_vboBuff[0]);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, m_vboBuff[0]);
             OpenGLMgr.CheckGLError();
-            GL.BufferData(All.ArrayBuffer, vtxStride * numIndices, vtxBuf, All.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, vtxStride * numIndices, vtxBuf, BufferUsageHint.StaticDraw);
             OpenGLMgr.CheckGLError();
 
-            GL.BindBuffer(All.ElementArrayBuffer, m_vboBuff[1]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, m_vboBuff[1]);
             OpenGLMgr.CheckGLError();
-            GL.BufferData(All.ElementArrayBuffer, sizeof(ushort) * numIndices, indices, All.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(ushort) * numIndices, indices, BufferUsageHint.StaticDraw);
             OpenGLMgr.CheckGLError();
         }
 
-        GL.BindBuffer(All.ArrayBuffer, m_vboBuff[0]);
+        GL.BindBuffer(BufferTarget.ArrayBuffer, m_vboBuff[0]);
         OpenGLMgr.CheckGLError();
-        GL.BindBuffer(All.ElementArrayBuffer, m_vboBuff[1]);
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, m_vboBuff[1]);
         OpenGLMgr.CheckGLError();
 
         GL.EnableVertexAttribArray(VERTEX_POS_INDX);
@@ -155,6 +155,7 @@ void main()
         OpenGLMgr.CheckGLError();
 
         //int test = 0;
+        //GL.DrawElements(BeginMode.Triangles, numIndices, DrawElementsType.UnsignedShort, 0);
         GL.DrawElements(PrimitiveType.Triangles, numIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
         OpenGLMgr.CheckGLError();
 
@@ -163,9 +164,9 @@ void main()
         GL.DisableVertexAttribArray(VERTEX_COLOR_INDX);
         OpenGLMgr.CheckGLError();
 
-        GL.BindBuffer(All.ArrayBuffer, 0);
+        GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         OpenGLMgr.CheckGLError();
-        GL.BindBuffer(All.ElementArrayBuffer, 0);
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
         OpenGLMgr.CheckGLError();
     }
 }
