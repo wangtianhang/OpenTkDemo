@@ -75,20 +75,20 @@ void main()
 
         float[] black = new float[] { 0, 0, 0, 1 };
         GL.ClearBuffer(ClearBuffer.Color, 0, black);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         GL.UseProgram(m_program);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         int offsetLoc = GL.GetUniformLocation(m_program, "u_offset");
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         GL.Uniform1(offsetLoc, 0f);
         DrawPrimitiveWithoutVBOs(vertices, indices);
 
         GL.Flush();
         
         GL.Uniform1(offsetLoc, 1f);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         
         DrawPrimitiveWithVBOs(3, vertices, sizeof(float) * (VERTEX_POS_SIZE + VERTEX_COLOR_SIZE), 3, indices);
 
@@ -99,14 +99,14 @@ void main()
      void DrawPrimitiveWithoutVBOs(float[] vertices, ushort[] indices)
      {
          GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
          GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
  
          GL.EnableVertexAttribArray(VERTEX_POS_INDX);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
          GL.EnableVertexAttribArray(VERTEX_COLOR_INDX);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
  
          int stride = sizeof(float) * (VERTEX_POS_SIZE + VERTEX_COLOR_SIZE);
 
@@ -118,11 +118,11 @@ void main()
          }
 
          GL.VertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, VertexAttribPointerType.Float, false, stride, m_ptr);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
          GL.VertexAttribPointer(VERTEX_COLOR_INDX, VERTEX_COLOR_SIZE, VertexAttribPointerType.Float, false, stride, m_ptr + sizeof(float) * VERTEX_POS_SIZE);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
          GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedShort, indices);
-         OpenGLMgr.CheckGLError();
+         //OpenGLMgr.CheckGLError();
  
          GL.DisableVertexAttribArray(VERTEX_POS_INDX);
          GL.DisableVertexAttribArray(VERTEX_COLOR_INDX);
@@ -133,50 +133,50 @@ void main()
         if(m_vboBuff[0] == 0 && m_vboBuff[1] == 0)
         {
             GL.GenBuffers(2, m_vboBuff);
-            OpenGLMgr.CheckGLError();
+            //OpenGLMgr.CheckGLError();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, m_vboBuff[0]);
-            OpenGLMgr.CheckGLError();
+            //OpenGLMgr.CheckGLError();
             GL.BufferData(BufferTarget.ArrayBuffer, vtxStride * numIndices, vtxBuf, BufferUsageHint.StaticDraw);
-            OpenGLMgr.CheckGLError();
+            //OpenGLMgr.CheckGLError();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, m_vboBuff[1]);
-            OpenGLMgr.CheckGLError();
+            //OpenGLMgr.CheckGLError();
             GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(ushort) * numIndices, indices, BufferUsageHint.StaticDraw);
-            OpenGLMgr.CheckGLError();
+            //OpenGLMgr.CheckGLError();
         }
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, m_vboBuff[0]);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, m_vboBuff[1]);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         GL.EnableVertexAttribArray(VERTEX_POS_INDX);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         GL.EnableVertexAttribArray(VERTEX_COLOR_INDX);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         int offset = 0;
         GL.VertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, VertexAttribPointerType.Float, false, vtxStride, offset);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         offset += VERTEX_POS_SIZE * sizeof(float);
         GL.VertexAttribPointer(VERTEX_COLOR_INDX, VERTEX_COLOR_SIZE, VertexAttribPointerType.Float, false, vtxStride, offset);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         //int test = 0;
         //GL.DrawElements(BeginMode.Triangles, numIndices, DrawElementsType.UnsignedShort, 0);
         GL.DrawElements(PrimitiveType.Triangles, numIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         GL.DisableVertexAttribArray(VERTEX_POS_INDX);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         GL.DisableVertexAttribArray(VERTEX_COLOR_INDX);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-        OpenGLMgr.CheckGLError();
+        //OpenGLMgr.CheckGLError();
     }
 }
 

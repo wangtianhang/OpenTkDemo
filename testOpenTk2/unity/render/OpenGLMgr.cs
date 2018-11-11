@@ -45,6 +45,15 @@ class OpenGLMgr
         return shaderProgram;
     }
 
+    public static void ClearGLError()
+    {
+        ErrorCode error = GL.GetError();
+        while (error != ErrorCode.NoError)
+        {
+            error = GL.GetError();
+        }
+    }
+
     public static void CheckGLError()
     {
         ErrorCode error = GL.GetError();
