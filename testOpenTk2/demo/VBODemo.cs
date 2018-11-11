@@ -62,11 +62,11 @@ void main()
 
         float[] vertices = new float[]
         {
-            -0.5f, 0.5f, 0.0f, //v0
+            0f, 0.5f, 0.0f, //v0
             1.0f, 0f, 0f, 1f, // c0
-            -1f, -0.5f, 0f, // v1
+            -0.5f, -0.5f, 0f, // v1
             0f, 1f, 0f, 1f, // c1
-            0f, -0.5f, 0f, //v2
+            0.5f, -0.5f, 0f, //v2
             0f, 0f, 1f, 1f, //c2
         };
         ushort[] indices = new ushort[] { 0, 1, 2 };
@@ -82,7 +82,7 @@ void main()
         OpenGLMgr.CheckGLError();
         //GL.Uniform1(offsetLoc, 0);
         //DrawPrimitiveWithoutVBOs(vertices, indices);
-        GL.Uniform1(offsetLoc, 1f);
+        GL.Uniform1(offsetLoc, 0.25f);
         OpenGLMgr.CheckGLError();
         
         DrawPrimitiveWithVBOs(3, vertices, sizeof(float) * (VERTEX_POS_SIZE + VERTEX_COLOR_SIZE), 3, indices);
@@ -133,7 +133,7 @@ void main()
 
             GL.BindBuffer(All.ElementArrayBuffer, m_vboBuff[1]);
             OpenGLMgr.CheckGLError();
-            GL.BufferData(All.ElementArrayBuffer, sizeof(short) * numIndices, indices, All.StaticDraw);
+            GL.BufferData(All.ElementArrayBuffer, sizeof(ushort) * numIndices, indices, All.StaticDraw);
             OpenGLMgr.CheckGLError();
         }
 

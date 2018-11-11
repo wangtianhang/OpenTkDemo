@@ -50,7 +50,7 @@ class OpenGLMgr
         ErrorCode error = GL.GetError();
         if (error != ErrorCode.NoError)
         {
-            Console.WriteLine("CheckGLError " + error);
+            //Console.WriteLine("CheckGLError " + error);
         }
     }
 }
