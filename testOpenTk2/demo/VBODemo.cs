@@ -82,8 +82,10 @@ void main()
 
         int offsetLoc = GL.GetUniformLocation(m_program, "u_offset");
         OpenGLMgr.CheckGLError();
-        GL.Uniform1(offsetLoc, 0);
+        GL.Uniform1(offsetLoc, 0f);
         DrawPrimitiveWithoutVBOs(vertices, indices);
+
+        GL.Flush();
         
         GL.Uniform1(offsetLoc, 1f);
         OpenGLMgr.CheckGLError();
@@ -112,6 +114,7 @@ void main()
          {
              m_ptr = Marshal.AllocHGlobal(sizeof(float) * vertices.Length);
              Marshal.Copy(vertices, 0, m_ptr, vertices.Length);
+             //Marshal.FreeHGlobal(m_ptr);
          }
 
          GL.VertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, VertexAttribPointerType.Float, false, stride, m_ptr);
