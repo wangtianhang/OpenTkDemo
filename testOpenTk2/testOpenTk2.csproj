@@ -53,6 +53,7 @@
     <Compile Include="demo\DemoFactory.cs" />
     <Compile Include="demo\OpenGLTriangleDemo.cs" />
     <Compile Include="demo\FakeUnityDemo.cs" />
+    <Compile Include="demo\Texture2DDemo.cs" />
     <Compile Include="demo\VADemo.cs" />
     <Compile Include="demo\VAODemo.cs" />
     <Compile Include="demo\VBODemo.cs" />
