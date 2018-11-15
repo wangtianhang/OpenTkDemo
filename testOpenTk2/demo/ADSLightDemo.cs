@@ -72,6 +72,9 @@ smooth in vec3 vVaryingLightDir;
 
 void main(void)
     { 
+    vFragColor.rgb = vec3(1, 1, 1);
+return;
+
     // Dot product gives us diffuse intensity
     float diff = max(0.0, dot(normalize(vVaryingNormal), normalize(vVaryingLightDir)));
 
@@ -289,34 +292,62 @@ void main(void)
 
         Matrix4x4 mv = camera * model;
         Matrix4x4 mvp = projection * camera * model;
-        GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
-        GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));
+        OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
+        OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
+        GL.UniformMatrix4(m_locMVP, false, ref mvp2);
+        GL.UniformMatrix4(m_locMV, false, ref mv2);
 
         GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
     }
 
-    float[] ConverToFloat(Matrix4x4 mat)
+     float[] ConverToFloat(Matrix4x4 mat)
+     {
+         float[] ret = new float[16];
+         ret[0] = mat.m00;
+         ret[1] = mat.m01;
+         ret[2] = mat.m02;
+         ret[3] = mat.m03;
+ 
+         ret[4] = mat.m10;
+         ret[5] = mat.m11;
+         ret[6] = mat.m12;
+         ret[7] = mat.m13;
+ 
+         ret[8] = mat.m20;
+         ret[9] = mat.m21;
+         ret[10] = mat.m22;
+         ret[11] = mat.m23;
+ 
+         ret[12] = mat.m30;
+         ret[13] = mat.m31;
+         ret[14] = mat.m32;
+         ret[15] = mat.m33;
+ 
+         return ret;
+     }
+
+    OpenTK.Matrix4 ConverToFloat2(Matrix4x4 mat)
     {
-        float[] ret = new float[16];
-        ret[0] = mat.m00;
-        ret[1] = mat.m01;
-        ret[2] = mat.m02;
-        ret[3] = mat.m03;
+        OpenTK.Matrix4 ret = new OpenTK.Matrix4();
+        ret.M11 = mat.m00;
+        ret.M12 = mat.m01;
+        ret.M13 = mat.m02;
+        ret.M14 = mat.m03;
 
-        ret[4] = mat.m10;
-        ret[5] = mat.m11;
-        ret[6] = mat.m12;
-        ret[7] = mat.m13;
+        ret.M21 = mat.m10;
+        ret.M22 = mat.m11;
+        ret.M23 = mat.m12;
+        ret.M24 = mat.m13;
 
-        ret[8] = mat.m20;
-        ret[9] = mat.m21;
-        ret[10] = mat.m22;
-        ret[11] = mat.m23;
+        ret.M31 = mat.m20;
+        ret.M32 = mat.m21;
+        ret.M33 = mat.m22;
+        ret.M34 = mat.m23;
 
-        ret[12] = mat.m30;
-        ret[13] = mat.m31;
-        ret[14] = mat.m32;
-        ret[15] = mat.m33;
+        ret.M41 = mat.m30;
+        ret.M42 = mat.m31;
+        ret.M43 = mat.m32;
+        ret.M44 = mat.m33;
 
         return ret;
     }
