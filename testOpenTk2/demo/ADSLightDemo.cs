@@ -287,11 +287,11 @@ return;
         GL.Uniform3(m_locLight, 1, vEyeLight);
 
         Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        Matrix4x4 camera = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.identity, Vector3.one);
+        Matrix4x4 view = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.identity, Vector3.one);
         Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
-        Matrix4x4 mv = camera * model;
-        Matrix4x4 mvp = projection * camera * model;
+        Matrix4x4 mv = view * model;
+        Matrix4x4 mvp = projection * view * model;
         OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
         GL.UniformMatrix4(m_locMVP, false, ref mvp2);
