@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="demo\DemoConfig.cs" />
     <Compile Include="demo\DemoFactory.cs" />
+    <Compile Include="demo\FBOAndRBODemo.cs" />
     <Compile Include="demo\OpenGLTriangleDemo.cs" />
     <Compile Include="demo\FakeUnityDemo.cs" />
     <Compile Include="demo\PBODemo.cs" />

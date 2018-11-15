@@ -15,6 +15,7 @@ public enum DemoType
     VAODemo,
     Texture2D,
     PBODemo,
+    FBOAndRBODemo,
 }
 
 public interface IDemo
@@ -58,6 +59,10 @@ class DemoFactory
         else if (DemoConfig.m_demoType == DemoType.PBODemo)
         {
             return new PBODemo();
+        }
+        else if (DemoConfig.m_demoType == DemoType.FBOAndRBODemo)
+        {
+            return new FBOAndRBODemo();
         }
         else
         {
