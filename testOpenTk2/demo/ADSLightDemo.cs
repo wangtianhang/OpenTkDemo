@@ -48,8 +48,8 @@ void main(void)
 
 
     // Don't forget to transform the geometry!
-    //gl_Position = mvpMatrix * vVertex;
-gl_Position = vVertex;
+    gl_Position = mvpMatrix * vVertex;
+//gl_Position = vVertex;
     }
 ";
 
@@ -73,8 +73,8 @@ in vec3 vVaryingLightDir;
 
 void main(void)
     { 
-    vFragColor.rgb = vec3(1, 1, 1);
-return;
+    //vFragColor.rgb = vec3(1, 1, 1);
+//return;
 
     // Dot product gives us diffuse intensity
     float diff = max(0.0, dot(normalize(vVaryingNormal), normalize(vVaryingLightDir)));
@@ -98,7 +98,7 @@ return;
     public class MeshData
     {
         public float[] m_data;
-        public int[] m_index;
+        public ushort[] m_index;
     }
 
     public int m_program;
@@ -170,7 +170,7 @@ return;
         vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
 
 
-        List<int> index = new List<int>();
+        List<ushort> index = new List<ushort>();
         index.Add(0);
         index.Add(2);
         index.Add(3);
