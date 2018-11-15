@@ -287,17 +287,29 @@ return;
         GL.Uniform3(m_locLight, 1, vEyeLight);
 
         Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        Matrix4x4 view = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.identity, Vector3.one);
+        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.identity, Vector3.one);
+        Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
         Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
         Matrix4x4 mv = view * model;
         Matrix4x4 mvp = projection * view * model;
+        UnityEngine.Debug.Log(mvp.ToString());
         OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
         GL.UniformMatrix4(m_locMVP, false, ref mvp2);
         GL.UniformMatrix4(m_locMV, false, ref mv2);
 
         GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
+    }
+
+    public static Matrix4x4 worldToCameraMatrix(Matrix4x4 cameraLocalToWorld)
+    {
+        Matrix4x4 worldToLocal = cameraLocalToWorld.inverse;
+        worldToLocal.m20 *= -1f;
+        worldToLocal.m21 *= -1f;
+        worldToLocal.m22 *= -1f;
+        worldToLocal.m23 *= -1f;
+        return worldToLocal;
     }
 
      float[] ConverToFloat(Matrix4x4 mat)
