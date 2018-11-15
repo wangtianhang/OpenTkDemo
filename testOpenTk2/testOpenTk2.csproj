@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="demo\ADSLightDemo.cs" />
     <Compile Include="demo\DemoConfig.cs" />
     <Compile Include="demo\DemoFactory.cs" />
     <Compile Include="demo\FBOAndRBODemo.cs" />
