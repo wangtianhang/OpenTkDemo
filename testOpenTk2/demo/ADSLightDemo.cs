@@ -48,7 +48,8 @@ void main(void)
 
 
     // Don't forget to transform the geometry!
-    gl_Position = mvpMatrix * vVertex;
+    gl_Position = mvpMatrix * vec4(vVertex.xyz, 1);
+//gl_Position.xyzw /=  gl_Position.w;
 //gl_Position = vVertex;
     }
 ";
@@ -116,6 +117,8 @@ void main(void)
 
     int m_width;
     int m_height;
+
+    public double m_accTime = 0;
 
     public void Init(MainWindow mainWindow)
     {
@@ -288,7 +291,10 @@ void main(void)
         GL.Uniform3(m_locLight, 1, vEyeLight);
 
         Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.identity, Vector3.one);
+
+        m_accTime += e.Time;
+
+        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f * (float)Math.Sin(m_accTime), 4.47f, -4.57f * (float)Math.Cos(m_accTime)), Quaternion.Euler(45, 0, 0), Vector3.one);
         Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
         Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
@@ -297,8 +303,10 @@ void main(void)
         //UnityEngine.Debug.Log(mvp.ToString());
         OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
-        GL.UniformMatrix4(m_locMVP, false, ref mvp2);
-        GL.UniformMatrix4(m_locMV, false, ref mv2);
+        //GL.UniformMatrix4(m_locMVP, false, ref mvp2);
+        //GL.UniformMatrix4(m_locMV, false, ref mv2);
+        GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
+        GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));
 
         GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
     }
@@ -338,6 +346,32 @@ void main(void)
  
          return ret;
      }
+
+//      float[] ConverToFloat3(Matrix4x4 mat)
+//      {
+//          float[] ret = new float[16];
+//          ret[0] = mat.m00;
+//          ret[1] = mat.m10;
+//          ret[2] = mat.m20;
+//          ret[3] = mat.m30;
+// 
+//          ret[4] = mat.m01;
+//          ret[5] = mat.m11;
+//          ret[6] = mat.m21;
+//          ret[7] = mat.m31;
+// 
+//          ret[8] = mat.m02;
+//          ret[9] = mat.m12;
+//          ret[10] = mat.m22;
+//          ret[11] = mat.m32;
+// 
+//          ret[12] = mat.m03;
+//          ret[13] = mat.m13;
+//          ret[14] = mat.m23;
+//          ret[15] = mat.m33;
+// 
+//          return ret;
+//      }
 
     OpenTK.Matrix4 ConverToFloat2(Matrix4x4 mat)
     {
