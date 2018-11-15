@@ -29,8 +29,8 @@ uniform mat4   mvMatrix;
 uniform vec3   vLightPosition;
 
 // Color to fragment program
-smooth out vec3 vVaryingNormal;
-smooth out vec3 vVaryingLightDir;
+out vec3 vVaryingNormal;
+out vec3 vVaryingLightDir;
 
 void main(void) 
     { 
@@ -48,7 +48,8 @@ void main(void)
 
 
     // Don't forget to transform the geometry!
-    gl_Position = mvpMatrix * vVertex;
+    //gl_Position = mvpMatrix * vVertex;
+gl_Position = vVertex;
     }
 ";
 
@@ -66,8 +67,8 @@ uniform vec4    ambientColor;
 uniform vec4    diffuseColor;   
 uniform vec4    specularColor;
 
-smooth in vec3 vVaryingNormal;
-smooth in vec3 vVaryingLightDir;
+in vec3 vVaryingNormal;
+in vec3 vVaryingLightDir;
 
 
 void main(void)
@@ -125,8 +126,8 @@ return;
         m_ptr = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
         Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
 
-        GL.Enable(EnableCap.DepthTest);
-        GL.Enable(EnableCap.CullFace);
+        //GL.Enable(EnableCap.DepthTest);
+        //GL.Enable(EnableCap.CullFace);
 
         m_locAmbient = GL.GetUniformLocation(m_program, "ambientColor");
         m_locDiffuse = GL.GetUniformLocation(m_program, "diffuseColor");
@@ -293,7 +294,7 @@ return;
 
         Matrix4x4 mv = view * model;
         Matrix4x4 mvp = projection * view * model;
-        UnityEngine.Debug.Log(mvp.ToString());
+        //UnityEngine.Debug.Log(mvp.ToString());
         OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
         GL.UniformMatrix4(m_locMVP, false, ref mvp2);
