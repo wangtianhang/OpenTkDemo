@@ -39,10 +39,15 @@ void main()
     IntPtr m_ptr;
 
     public int m_fboId = 0;
+    public int m_depthRbo = 0;
+    public int m_colorRbo = 0;
+
+    int m_width;
+    int m_height;
 
     public void Init(MainWindow mainWindow)
     {
-        m_fboId = GL.GenFramebuffer();
+        
 
         m_program = OpenGLMgr._CompilerShader(vShaderStr, fShaderStr);
 
@@ -59,6 +64,32 @@ void main()
                         };
         m_ptr = Marshal.AllocHGlobal(sizeof(float) * vVertices.Length);
         Marshal.Copy(vVertices, 0, m_ptr, vVertices.Length);
+
+        m_width = mainWindow.Width;
+        m_height = mainWindow.Height;
+
+        InitFBOAndRBO();
+        
+    }
+
+
+    void InitFBOAndRBO()
+    {
+        m_fboId = GL.GenFramebuffer();
+
+        m_depthRbo = GL.GenRenderbuffer();
+        GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, m_depthRbo);
+        GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent32f, m_width, m_height);
+
+        m_colorRbo = GL.GenRenderbuffer();
+        GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, m_colorRbo);
+        GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.Rgba8, m_width, m_height);
+
+        GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, m_fboId);
+        GL.FramebufferRenderbuffer(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, m_depthRbo);
+        GL.FramebufferRenderbuffer(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.ColorAttachment0, RenderbufferTarget.Renderbuffer, m_colorRbo);
+
+        GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
     }
 
     public int CreateSimpleTexture2D()
@@ -94,6 +125,12 @@ void main()
 
     public void OnRenderFrame(FrameEventArgs e)
     {
+        //int[] fboArray = new int[1];
+        All[] fboBuffs = new All[] { All.ColorAttachment0 };
+        //fboArray[0] = m_fboId;
+        GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, m_fboId);
+        GL.DrawBuffers(1, fboBuffs);
+
         ushort[] indices = { 0, 1, 2, 0, 2, 3 };
 
         float[] black = new float[] { 0, 0, 0, 1 };
@@ -117,6 +154,11 @@ void main()
         GL.Uniform1(index, (int)All.Texture0);
 
         GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedShort, indices);
+
+        GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+        GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, m_fboId);
+        GL.ReadBuffer(All.ColorAttachment0);
+        GL.BlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width / 2, m_height / 2, All.ColorBufferBit, All.Nearest);
     }
 }
 
