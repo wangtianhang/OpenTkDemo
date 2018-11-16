@@ -258,7 +258,7 @@ void main(void)
         //Matrix4x4 mv = view * model;
         //Matrix4x4 mvp = projection * view * model;
 
-        OpenTK.Matrix4 model = TRS(OpenTK.Vector3.One, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
+        OpenTK.Matrix4 model = SRT(OpenTK.Vector3.One, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
         //OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
         //OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
         OpenTK.Matrix4 view = LookAt(new OpenTK.Vector3(10, 10, 10), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
@@ -282,12 +282,12 @@ void main(void)
         GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
     }
 
-    public static OpenTK.Matrix4 TRS(OpenTK.Vector3 pos, OpenTK.Quaternion qua, OpenTK.Vector3 scale)
+    public static OpenTK.Matrix4 SRT(OpenTK.Vector3 pos, OpenTK.Quaternion qua, OpenTK.Vector3 scale)
     {
         OpenTK.Matrix4 t = OpenTK.Matrix4.CreateTranslation(pos);
         OpenTK.Matrix4 r = OpenTK.Matrix4.CreateFromQuaternion(qua);
         OpenTK.Matrix4 s = OpenTK.Matrix4.CreateScale(scale);
-        return t * r * s;
+        return s * r * t;
     }
 
     public static OpenTK.Matrix4 LookAt(OpenTK.Vector3 eye, OpenTK.Vector3 center, OpenTK.Vector3 up)
