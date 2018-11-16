@@ -22,7 +22,6 @@ precision highp float;
 layout(location = 0) in vec4 vVertex;
 layout(location = 1) in vec3 vNormal;
 
-
 uniform mat4   mvpMatrix;
 uniform mat4   mvMatrix;
 //uniform mat3   normalMatrix;
@@ -48,7 +47,7 @@ void main(void)
 
 
     // Don't forget to transform the geometry!
-    gl_Position = mvpMatrix * vec4(vVertex.xyz, 1);
+    gl_Position = mvpMatrix * vVertex;
 //gl_Position.xyzw /=  gl_Position.w;
 //gl_Position = vVertex;
     }
@@ -74,8 +73,8 @@ in vec3 vVaryingLightDir;
 
 void main(void)
     { 
-    //vFragColor.rgb = vec3(1, 1, 1);
-//return;
+    vFragColor.rgb = vec3(1, 1, 1);
+return;
 
     // Dot product gives us diffuse intensity
     float diff = max(0.0, dot(normalize(vVaryingNormal), normalize(vVaryingLightDir)));
@@ -133,11 +132,17 @@ void main(void)
         //GL.Enable(EnableCap.CullFace);
 
         m_locAmbient = GL.GetUniformLocation(m_program, "ambientColor");
+        Debug.Log("m_locAmbient" + m_locAmbient);
         m_locDiffuse = GL.GetUniformLocation(m_program, "diffuseColor");
+        Debug.Log("m_locDiffuse" + m_locDiffuse);
         m_locSpecular = GL.GetUniformLocation(m_program, "specularColor");
+        Debug.Log("m_locSpecular" + m_locSpecular);
         m_locLight = GL.GetUniformLocation(m_program, "vLightPosition");
+        Debug.Log("m_locLight" + m_locLight);
         m_locMVP = GL.GetUniformLocation(m_program, "mvpMatrix");
+        Debug.Log("m_locMVP" + m_locMVP);
         m_locMV = GL.GetUniformLocation(m_program, "mvMatrix");
+        Debug.Log("m_locMV" + m_locMV);
         //m_locNM = GL.GetUniformLocation(m_program, "normalMatrix");
 
         m_width = mainWindow.Width;
@@ -302,7 +307,7 @@ void main(void)
         OpenTK.Matrix4 model = TRS(OpenTK.Vector3.Zero, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
         //OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
         //OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
-        OpenTK.Matrix4 view = LookAt(new OpenTK.Vector3(0, 0, 50), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
+        OpenTK.Matrix4 view = LookAt(new OpenTK.Vector3(10, 10, 10), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
         OpenTK.Matrix4 projection = Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
         OpenTK.Matrix4 mv = view * model;
@@ -311,7 +316,10 @@ void main(void)
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         //OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
-        GL.UniformMatrix4(m_locMVP, false, ref mvp);
+        OpenGLMgr.ClearGLError();
+        //GL.UniformMatrix4(m_locMVP, false, ref mvp);
+        GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
+        OpenGLMgr.CheckGLError();
         GL.UniformMatrix4(m_locMV, false, ref mv);
         //GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
         //GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));
@@ -390,6 +398,31 @@ void main(void)
         worldToLocal.m22 *= -1f;
         worldToLocal.m23 *= -1f;
         return worldToLocal;
+    }
+
+    float[] ConverToFloat(OpenTK.Matrix4 mat)
+    {
+        float[] ret = new float[16];
+        ret[0] = mat.M11;
+        ret[1] = mat.M12;
+        ret[2] = mat.M13;
+        ret[3] = mat.M14;
+
+        ret[4] = mat.M21;
+        ret[5] = mat.M22;
+        ret[6] = mat.M23;
+        ret[7] = mat.M24;
+
+        ret[8] = mat.M31;
+        ret[9] = mat.M32;
+        ret[10] =mat.M33;
+        ret[11] =mat.M34;
+
+        ret[12] =mat.M41;
+        ret[13] =mat.M42;
+        ret[14] =mat.M43;
+        ret[15] = mat.M44;
+        return ret;
     }
 
 //      float[] ConverToFloat(Matrix4x4 mat)
