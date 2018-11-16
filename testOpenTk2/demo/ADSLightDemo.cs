@@ -120,7 +120,8 @@ void main(void)
         m_ptr = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
         Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
 
-        //GL.Enable(EnableCap.DepthTest);
+        GL.Enable(EnableCap.DepthTest);
+        GL.DepthFunc(All.Lequal);
         GL.Enable(EnableCap.CullFace);
 
         OpenGLMgr.ClearGLError();
@@ -266,6 +267,8 @@ void main(void)
 
         float[] black = new float[] { 0, 0, 0, 1 };
         GL.ClearBuffer(ClearBuffer.Color, 0, black);
+        float[] ones = new float[] { 1.0f };
+        GL.ClearBuffer(ClearBuffer.Depth, 0, ones);
 
         GL.UseProgram(m_program);
 
