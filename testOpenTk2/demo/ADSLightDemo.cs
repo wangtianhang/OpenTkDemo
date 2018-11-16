@@ -294,7 +294,7 @@ void main(void)
 
         m_accTime += e.Time;
 
-        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f * (float)Math.Sin(m_accTime), 4.47f, -4.57f * (float)Math.Cos(m_accTime)), Quaternion.Euler(45, 0, 0), Vector3.one);
+        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.Euler(45, 0, 0), Vector3.one);
         Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
         Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
