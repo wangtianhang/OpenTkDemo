@@ -8,6 +8,11 @@ namespace UnityEngine
 {
     public class GameObject : Object
     {
+        public GameObject()
+        {
+
+        }
+
         public GameObject(string name)
         {
             this.name = name;

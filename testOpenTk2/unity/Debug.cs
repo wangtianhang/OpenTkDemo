@@ -24,6 +24,11 @@ namespace UnityEngine
             Console.WriteLine(str);
         }
 
+        public static void Log(System.Object param)
+        {
+            Log(param);
+        }
+
         public static void Log(Object obj)
         {
             Init();

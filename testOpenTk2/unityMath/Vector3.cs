@@ -322,6 +322,11 @@ namespace UnityEngine
             return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
         }
 
+        public static Vector3 Divide(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+        }
+
         public void Set(float new_x, float new_y, float new_z)
         {
             x = new_x;
