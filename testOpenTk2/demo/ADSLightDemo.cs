@@ -300,8 +300,9 @@ void main(void)
         //Matrix4x4 mvp = projection * view * model;
 
         OpenTK.Matrix4 model = TRS(OpenTK.Vector3.Zero, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
-        OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
-        OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
+        //OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
+        //OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
+        OpenTK.Matrix4 view = LookAt(new OpenTK.Vector3(0, 0, 50), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
         OpenTK.Matrix4 projection = Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
         OpenTK.Matrix4 mv = view * model;
@@ -326,21 +327,39 @@ void main(void)
         return t * r * s;
     }
 
-    public static OpenTK.Matrix4 TRS(OpenTK.Matrix4 t, OpenTK.Matrix4 r, OpenTK.Matrix4 s)
+    public static OpenTK.Matrix4 LookAt(OpenTK.Vector3 eye, OpenTK.Vector3 center, OpenTK.Vector3 up)
     {
-        return t * r * s;
+        OpenTK.Vector3 f = (center - eye).Normalized();
+        OpenTK.Vector3 upN = up.Normalized();
+        OpenTK.Vector3 s = OpenTK.Vector3.Cross(f, upN);
+        OpenTK.Vector3 u = OpenTK.Vector3.Cross(s, f);
+        OpenTK.Matrix4 ret = new OpenTK.Matrix4();
+
+        ret.M11 = s[0]; ret.M12 = u[0]; ret.M13 = -f[0]; ret.M14 = 0;
+        ret.M21 = s[1]; ret.M22 = u[1]; ret.M23 = -f[1]; ret.M24 = 0;
+        ret.M31 = s[2]; ret.M32 = u[2]; ret.M33 = -f[2]; ret.M34 = 0;
+        ret.M41 = 0; ret.M42 = 0; ret.M43 = 0; ret.M44 = 1;
+
+        ret *= OpenTK.Matrix4.CreateTranslation(-eye);
+
+        return ret;
     }
 
-    public static OpenTK.Matrix4 worldToCameraMatrix(OpenTK.Matrix4 cameraLocalToWorld)
-    {
-        OpenTK.Matrix4 worldToLocal = new OpenTK.Matrix4();
-        OpenTK.Matrix4.Invert(ref cameraLocalToWorld, out worldToLocal);
-//         worldToLocal.M13 *= -1f;
-//         worldToLocal.M23 *= -1f;
-//         worldToLocal.M33 *= -1f;
-//         worldToLocal.M34 *= -1f;
-        return worldToLocal;
-    }
+//     public static OpenTK.Matrix4 TRS(OpenTK.Matrix4 t, OpenTK.Matrix4 r, OpenTK.Matrix4 s)
+//     {
+//         return t * r * s;
+//     }
+
+//     public static OpenTK.Matrix4 worldToCameraMatrix(OpenTK.Matrix4 cameraLocalToWorld)
+//     {
+//         OpenTK.Matrix4 worldToLocal = new OpenTK.Matrix4();
+//         OpenTK.Matrix4.Invert(ref cameraLocalToWorld, out worldToLocal);
+// //         worldToLocal.M13 *= -1f;
+// //         worldToLocal.M23 *= -1f;
+// //         worldToLocal.M33 *= -1f;
+// //         worldToLocal.M34 *= -1f;
+//         return worldToLocal;
+//     }
 
     public static OpenTK.Matrix4 Perspective(float fovy, float aspect, float n, float f)
     {
