@@ -290,25 +290,77 @@ void main(void)
         GL.Uniform4(m_locSpecular, 1, vSpecularColor);
         GL.Uniform3(m_locLight, 1, vEyeLight);
 
-        Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
-
         m_accTime += e.Time;
 
-        Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.Euler(45, 0, 0), Vector3.one);
-        Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
-        Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
+        //Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
+        //Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.Euler(45, 0, 0), Vector3.one);
+        //Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
+        //Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
+        //Matrix4x4 mv = view * model;
+        //Matrix4x4 mvp = projection * view * model;
 
-        Matrix4x4 mv = view * model;
-        Matrix4x4 mvp = projection * view * model;
+        OpenTK.Matrix4 model = TRS(OpenTK.Vector3.Zero, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
+        OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
+        OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
+        OpenTK.Matrix4 projection = Perspective(60, m_width / (float)m_height, 0.1f, 100f);
+
+        OpenTK.Matrix4 mv = view * model;
+        OpenTK.Matrix4 mvp = projection * view * model;
+
         //UnityEngine.Debug.Log(mvp.ToString());
-        OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
-        OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
-        //GL.UniformMatrix4(m_locMVP, false, ref mvp2);
-        //GL.UniformMatrix4(m_locMV, false, ref mv2);
-        GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
-        GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));
+        //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
+        //OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
+        GL.UniformMatrix4(m_locMVP, false, ref mvp);
+        GL.UniformMatrix4(m_locMV, false, ref mv);
+        //GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
+        //GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));
 
         GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
+    }
+
+    public static OpenTK.Matrix4 TRS(OpenTK.Vector3 pos, OpenTK.Quaternion qua, OpenTK.Vector3 scale)
+    {
+        OpenTK.Matrix4 t = OpenTK.Matrix4.CreateTranslation(pos);
+        OpenTK.Matrix4 r = OpenTK.Matrix4.CreateFromQuaternion(qua);
+        OpenTK.Matrix4 s = OpenTK.Matrix4.CreateScale(scale);
+        return t * r * s;
+    }
+
+    public static OpenTK.Matrix4 TRS(OpenTK.Matrix4 t, OpenTK.Matrix4 r, OpenTK.Matrix4 s)
+    {
+        return t * r * s;
+    }
+
+    public static OpenTK.Matrix4 worldToCameraMatrix(OpenTK.Matrix4 cameraLocalToWorld)
+    {
+        OpenTK.Matrix4 worldToLocal = new OpenTK.Matrix4();
+        OpenTK.Matrix4.Invert(ref cameraLocalToWorld, out worldToLocal);
+//         worldToLocal.M13 *= -1f;
+//         worldToLocal.M23 *= -1f;
+//         worldToLocal.M33 *= -1f;
+//         worldToLocal.M34 *= -1f;
+        return worldToLocal;
+    }
+
+    public static OpenTK.Matrix4 Perspective(float fovy, float aspect, float n, float f)
+    {
+        float q = 1.0f / (float)Math.Tan(Mathf.Deg2Rad * 0.5f * fovy);
+        float A = q / aspect;
+        float B = (n + f) / (n - f);
+        float C = (2.0f * n * f) / (n - f);
+
+        OpenTK.Matrix4 result = new OpenTK.Matrix4();
+
+        //result[0] = new OpenTK.Vector4(A, 0.0f, 0.0f, 0.0f);
+        //result[1] = new OpenTK.Vector4(0.0f, q, 0.0f, 0.0f);
+        //result[2] = new OpenTK.Vector4(0.0f, 0.0f, B, -1.0f);
+        //result[3] = new OpenTK.Vector4(0.0f, 0.0f, C, 0.0f);
+        result.M11 = A; result.M12 = 0; result.M13 = 0; result.M14 = 0;
+        result.M21 = 0; result.M22 = q; result.M23 = 0; result.M24 = 0;
+        result.M31 = 0; result.M32 = 0; result.M33 = B; result.M34 = -1;
+        result.M41 = 0; result.M42 = 0; result.M43 = C; result.M44 = 0;
+
+        return result;
     }
 
     public static Matrix4x4 worldToCameraMatrix(Matrix4x4 cameraLocalToWorld)
@@ -321,31 +373,31 @@ void main(void)
         return worldToLocal;
     }
 
-     float[] ConverToFloat(Matrix4x4 mat)
-     {
-         float[] ret = new float[16];
-         ret[0] = mat.m00;
-         ret[1] = mat.m01;
-         ret[2] = mat.m02;
-         ret[3] = mat.m03;
- 
-         ret[4] = mat.m10;
-         ret[5] = mat.m11;
-         ret[6] = mat.m12;
-         ret[7] = mat.m13;
- 
-         ret[8] = mat.m20;
-         ret[9] = mat.m21;
-         ret[10] = mat.m22;
-         ret[11] = mat.m23;
- 
-         ret[12] = mat.m30;
-         ret[13] = mat.m31;
-         ret[14] = mat.m32;
-         ret[15] = mat.m33;
- 
-         return ret;
-     }
+//      float[] ConverToFloat(Matrix4x4 mat)
+//      {
+//          float[] ret = new float[16];
+//          ret[0] = mat.m00;
+//          ret[1] = mat.m01;
+//          ret[2] = mat.m02;
+//          ret[3] = mat.m03;
+//  
+//          ret[4] = mat.m10;
+//          ret[5] = mat.m11;
+//          ret[6] = mat.m12;
+//          ret[7] = mat.m13;
+//  
+//          ret[8] = mat.m20;
+//          ret[9] = mat.m21;
+//          ret[10] = mat.m22;
+//          ret[11] = mat.m23;
+//  
+//          ret[12] = mat.m30;
+//          ret[13] = mat.m31;
+//          ret[14] = mat.m32;
+//          ret[15] = mat.m33;
+//  
+//          return ret;
+//      }
 
 //      float[] ConverToFloat3(Matrix4x4 mat)
 //      {
@@ -373,30 +425,30 @@ void main(void)
 //          return ret;
 //      }
 
-    OpenTK.Matrix4 ConverToFloat2(Matrix4x4 mat)
-    {
-        OpenTK.Matrix4 ret = new OpenTK.Matrix4();
-        ret.M11 = mat.m00;
-        ret.M12 = mat.m01;
-        ret.M13 = mat.m02;
-        ret.M14 = mat.m03;
-
-        ret.M21 = mat.m10;
-        ret.M22 = mat.m11;
-        ret.M23 = mat.m12;
-        ret.M24 = mat.m13;
-
-        ret.M31 = mat.m20;
-        ret.M32 = mat.m21;
-        ret.M33 = mat.m22;
-        ret.M34 = mat.m23;
-
-        ret.M41 = mat.m30;
-        ret.M42 = mat.m31;
-        ret.M43 = mat.m32;
-        ret.M44 = mat.m33;
-
-        return ret;
-    }
+//     OpenTK.Matrix4 ConverToFloat2(Matrix4x4 mat)
+//     {
+//         OpenTK.Matrix4 ret = new OpenTK.Matrix4();
+//         ret.M11 = mat.m00;
+//         ret.M12 = mat.m01;
+//         ret.M13 = mat.m02;
+//         ret.M14 = mat.m03;
+// 
+//         ret.M21 = mat.m10;
+//         ret.M22 = mat.m11;
+//         ret.M23 = mat.m12;
+//         ret.M24 = mat.m13;
+// 
+//         ret.M31 = mat.m20;
+//         ret.M32 = mat.m21;
+//         ret.M33 = mat.m22;
+//         ret.M34 = mat.m23;
+// 
+//         ret.M41 = mat.m30;
+//         ret.M42 = mat.m31;
+//         ret.M43 = mat.m32;
+//         ret.M44 = mat.m33;
+// 
+//         return ret;
+//     }
 }
 
