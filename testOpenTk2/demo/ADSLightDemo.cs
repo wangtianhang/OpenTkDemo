@@ -258,14 +258,15 @@ void main(void)
         //Matrix4x4 mv = view * model;
         //Matrix4x4 mvp = projection * view * model;
 
-        OpenTK.Matrix4 model = TRS(OpenTK.Vector3.Zero, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
+        OpenTK.Matrix4 model = TRS(OpenTK.Vector3.One, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
         //OpenTK.Matrix4 cameraLocaltoWorld = TRS(new OpenTK.Vector3(0, 0, 50), new OpenTK.Quaternion(0, 0, 0), OpenTK.Vector3.One);
         //OpenTK.Matrix4 view = worldToCameraMatrix(cameraLocaltoWorld);
         OpenTK.Matrix4 view = LookAt(new OpenTK.Vector3(10, 10, 10), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
         OpenTK.Matrix4 projection = Perspective(60, m_width / (float)m_height, 0.1f, 100f);
 
-        OpenTK.Matrix4 mv = view * model;
-        OpenTK.Matrix4 mvp = projection * view * model;
+        //  坑死。。opengl变换从左往右乘
+        OpenTK.Matrix4 mv = model * view;
+        OpenTK.Matrix4 mvp = model * view * projection;
 
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
@@ -302,9 +303,12 @@ void main(void)
         ret.M31 = s[2]; ret.M32 = u[2]; ret.M33 = -f[2]; ret.M34 = 0;
         ret.M41 = 0; ret.M42 = 0; ret.M43 = 0; ret.M44 = 1;
 
-        ret *= OpenTK.Matrix4.CreateTranslation(-eye);
+        OpenTK.Matrix4 tmp = OpenTK.Matrix4.CreateTranslation(-eye);
 
-        return ret;
+        OpenTK.Matrix4 finalRet = ret * tmp;
+        finalRet = tmp * ret;
+
+        return finalRet;
     }
 
 //     public static OpenTK.Matrix4 TRS(OpenTK.Matrix4 t, OpenTK.Matrix4 r, OpenTK.Matrix4 s)
