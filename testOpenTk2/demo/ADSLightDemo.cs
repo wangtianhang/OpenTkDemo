@@ -15,7 +15,7 @@ class ADSLightDemo : IDemo
 // Vertex Shader
 // Richard S. Wright Jr.
 // OpenGL SuperBible
-#version 430 core
+#version 300 es
 precision highp float;
 
 // Incoming per vertex... position and normal
@@ -23,9 +23,25 @@ layout(location = 0) in vec4 vVertex;
 layout(location = 1) in vec3 vNormal;
 
 uniform mat4   mvpMatrix;
+uniform mat4   mvMatrix;
+uniform vec3   vLightPosition;
+
+out vec3 vVaryingNormal;
+out vec3 vVaryingLightDir;
 
 void main(void) 
     { 
+// Get surface normal in eye coordinates
+    //mat3 normalMatrix = mvMatrix;
+    vec4 normalWrap = vec4(vNormal.x, vNormal.y, vNormal.z, 0);
+    vVaryingNormal = (mvMatrix * normalWrap).xyz;
+
+    // Get vertex position in eye coordinates
+    vec4 vPosition4 = mvMatrix * vVertex;
+    vec3 vPosition3 = vPosition4.xyz / vPosition4.w;
+
+    // Get vector to light source
+    vVaryingLightDir = normalize(vLightPosition - vPosition3);
 
     gl_Position = mvpMatrix * vVertex;
 
@@ -37,15 +53,39 @@ void main(void)
 // Fragment Shader
 // Richard S. Wright Jr.
 // OpenGL SuperBible
-#version 430 core
+#version 300 es
 precision highp float;
+
+
+uniform vec4    ambientColor;
+uniform vec4    diffuseColor; 
+uniform vec4 specularColor;
+
+in vec3 vVaryingNormal;
+in vec3 vVaryingLightDir;
 
 out vec4 vFragColor;
 
 void main(void)
     { 
-        vFragColor.rgb = vec3(1, 1, 1);
-}
+        // Dot product gives us diffuse intensity
+    float diff = max(0.0, dot(normalize(vVaryingNormal), normalize(vVaryingLightDir)));
+
+    // Multiply intensity by diffuse color, force alpha to 1.0
+    vFragColor = diff * diffuseColor;
+
+    // Add in ambient light
+    vFragColor += ambientColor;
+
+
+    // Specular Light
+    vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir), normalize(vVaryingNormal)));
+    float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
+    if(diff != 0f) {
+        float fSpec = pow(spec, 128.0);
+        vFragColor.rgb += vec3(fSpec, fSpec, fSpec);
+        }
+    }
 ";
     public class MeshData
     {
@@ -81,7 +121,7 @@ void main(void)
         Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
 
         //GL.Enable(EnableCap.DepthTest);
-        //GL.Enable(EnableCap.CullFace);
+        GL.Enable(EnableCap.CullFace);
 
         OpenGLMgr.ClearGLError();
         m_locAmbient = GL.GetUniformLocation(m_program, "ambientColor");
