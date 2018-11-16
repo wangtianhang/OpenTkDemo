@@ -15,7 +15,7 @@ class ADSLightDemo : IDemo
 // Vertex Shader
 // Richard S. Wright Jr.
 // OpenGL SuperBible
-#version 300 es
+#version 430 core
 precision highp float;
 
 // Incoming per vertex... position and normal
@@ -23,33 +23,12 @@ layout(location = 0) in vec4 vVertex;
 layout(location = 1) in vec3 vNormal;
 
 uniform mat4   mvpMatrix;
-uniform mat4   mvMatrix;
-//uniform mat3   normalMatrix;
-uniform vec3   vLightPosition;
-
-// Color to fragment program
-out vec3 vVaryingNormal;
-out vec3 vVaryingLightDir;
 
 void main(void) 
     { 
-    // Get surface normal in eye coordinates
-    //mat3 normalMatrix = mvMatrix;
-    vec4 normalWrap = vec4(vNormal.x, vNormal.y, vNormal.z, 0);
-    vVaryingNormal = (mvMatrix * normalWrap).xyz;
 
-    // Get vertex position in eye coordinates
-    vec4 vPosition4 = mvMatrix * vVertex;
-    vec3 vPosition3 = vPosition4.xyz / vPosition4.w;
-
-    // Get vector to light source
-    vVaryingLightDir = normalize(vLightPosition - vPosition3);
-
-
-    // Don't forget to transform the geometry!
     gl_Position = mvpMatrix * vVertex;
-//gl_Position.xyzw /=  gl_Position.w;
-//gl_Position = vVertex;
+
     }
 ";
 
@@ -58,42 +37,15 @@ void main(void)
 // Fragment Shader
 // Richard S. Wright Jr.
 // OpenGL SuperBible
-#version 300 es
+#version 430 core
 precision highp float;
 
 out vec4 vFragColor;
 
-uniform vec4    ambientColor;
-uniform vec4    diffuseColor;   
-uniform vec4    specularColor;
-
-in vec3 vVaryingNormal;
-in vec3 vVaryingLightDir;
-
-
 void main(void)
     { 
-    vFragColor.rgb = vec3(1, 1, 1);
-return;
-
-    // Dot product gives us diffuse intensity
-    float diff = max(0.0, dot(normalize(vVaryingNormal), normalize(vVaryingLightDir)));
-
-    // Multiply intensity by diffuse color, force alpha to 1.0
-    vFragColor = diff * diffuseColor;
-
-    // Add in ambient light
-    vFragColor += ambientColor;
-
-
-    // Specular Light
-    vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir), normalize(vVaryingNormal)));
-    float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
-    if(diff != 0f) {
-        float fSpec = pow(spec, 128.0);
-        vFragColor.rgb += vec3(fSpec, fSpec, fSpec);
-        }
-    }
+        vFragColor.rgb = vec3(1, 1, 1);
+}
 ";
     public class MeshData
     {
@@ -131,8 +83,10 @@ return;
         //GL.Enable(EnableCap.DepthTest);
         //GL.Enable(EnableCap.CullFace);
 
+        OpenGLMgr.ClearGLError();
         m_locAmbient = GL.GetUniformLocation(m_program, "ambientColor");
         Debug.Log("m_locAmbient" + m_locAmbient);
+        OpenGLMgr.CheckGLError();
         m_locDiffuse = GL.GetUniformLocation(m_program, "diffuseColor");
         Debug.Log("m_locDiffuse" + m_locDiffuse);
         m_locSpecular = GL.GetUniformLocation(m_program, "specularColor");
