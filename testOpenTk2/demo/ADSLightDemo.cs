@@ -492,7 +492,7 @@ void main(void)
     /// <param name="target"></param>
     /// <param name="up"></param>
     /// <returns></returns>
-    public static Matrix4x4 LookAt(Vector3 eye, Vector3 target, Vector3 up)
+    public static Matrix4x4 UnityLookAt(Vector3 eye, Vector3 target, Vector3 up)
     {
         Vector3 z = (eye - target).normalized;
         Vector3 x = Vector3.Cross(z, up).normalized;
