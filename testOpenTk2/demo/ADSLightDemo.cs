@@ -305,7 +305,8 @@ void main(void)
         Matrix4x4 mvpUnity = projectionUnity * viewUnity * modelUnity;
 
         //Vector3 testPoint = Vector3.one;
-        Vector4 testPoint = mvUnity.MultiplyPoint(Vector3.one); 
+        Vector4 testPoint = mvpUnity.MultiplyPoint(Vector3.one); 
+        //Vector4 testPoint = mvpUnity * Vector3.one; 
         //Matrix4x4 cameraLocalToWorldUnity = Matrix4x4.TRS(new Vector3(10, 10, 10), Quaternion.Euler(45, 0, 0), Vector3.one);
         //Matrix4x4 view = UnityWorldToCameraMatrix(cameraLocalToWorld);
         //Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
@@ -323,15 +324,18 @@ void main(void)
         OpenTK.Matrix4 mvp = model * view * projection;
 
         OpenTK.Vector4 testPoint2 = LeftMultiply(OpenTK.Vector3.One, mvp);
+        testPoint2 /= testPoint2.W;
         OpenTK.Vector4 testPoint3 = RightMultiply(mvp, OpenTK.Vector3.One);
-        OpenTK.Vector4 testPoint4 = LeftMultiply(OpenTK.Vector3.One, mv);
+        //OpenTK.Vector4 testPoint4 = LeftMultiply(OpenTK.Vector3.One, mvp);
 
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         //OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
         OpenGLMgr.ClearGLError();
         //GL.UniformMatrix4(m_locMVP, false, ref mvp);
+
         GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
+
         OpenGLMgr.CheckGLError();
         GL.UniformMatrix4(m_locMV, false, ref mv);
         //GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
