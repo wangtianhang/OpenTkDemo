@@ -324,8 +324,10 @@ void main(void)
         //  坑死。。opengl变换从左往右乘
         OpenTK.Matrix4 mv = model * view;
         OpenTK.Matrix4 mv2 = Multiply(model, view);
+        OpenTK.Matrix4 mv3 = GLVMathMultiply(view, model);
         OpenTK.Matrix4 mvp = model * view * projection;
         OpenTK.Matrix4 mvp2 = Multiply(mv2, projection);
+        OpenTK.Matrix4 mvp3 = GLVMathMultiply(projection, mv3);
 
         OpenTK.Vector4 testPoint2 = LeftMultiply(OpenTK.Vector3.One, mvp);
         testPoint2 /= testPoint2.W;
@@ -384,6 +386,26 @@ void main(void)
         Matrix4x4 t1 = ConvertOpenTkMatrixToUnityMatrix(lhs);
         Matrix4x4 t2 = ConvertOpenTkMatrixToUnityMatrix(rhs);
         return ConvertUnityMatrixToOpenTkMatrix(t1 * t2);
+    }
+
+    public static OpenTK.Matrix4 GLVMathMultiply(OpenTK.Matrix4 lhs, OpenTK.Matrix4 rhs)
+    {
+        OpenTK.Matrix4 result = new OpenTK.Matrix4();
+        for (int j = 0; j < 4; j++)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                float sum = 0;
+
+                for (int n = 0; n < 4; n++)
+                {
+                    sum += lhs[n, i] * rhs[j, n];
+                }
+
+                result[j, i] = sum;
+            }
+        }
+        return result;
     }
 
     public static OpenTK.Vector4 LeftMultiply(OpenTK.Vector3 tmp, OpenTK.Matrix4 mat)
