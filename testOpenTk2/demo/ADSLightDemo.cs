@@ -301,8 +301,10 @@ void main(void)
         Matrix4x4 cameraLocalToWorld = cameraTrans.localToWorldMatrix;
         Matrix4x4 viewUnity = UnityWorldToCameraMatrix(cameraLocalToWorld);
         Matrix4x4 projectionUnity = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
-        Matrix4x4 mvUnity = modelUnity * viewUnity;
+        Matrix4x4 mvUnity = viewUnity * modelUnity;
         Matrix4x4 mvpUnity = projectionUnity * viewUnity * modelUnity;
+        Matrix4x4 mvUnity2 = viewUnity.transpose * modelUnity.transpose;
+        Matrix4x4 mvpUnity2 = projectionUnity.transpose * viewUnity.transpose * modelUnity.transpose;
 
         //Vector3 testPoint = Vector3.one;
         Vector4 testPoint = mvpUnity.MultiplyPoint(Vector3.one); 
@@ -321,7 +323,9 @@ void main(void)
 
         //  坑死。。opengl变换从左往右乘
         OpenTK.Matrix4 mv = model * view;
+        OpenTK.Matrix4 mv2 = Multiply(model, view);
         OpenTK.Matrix4 mvp = model * view * projection;
+        OpenTK.Matrix4 mvp2 = Multiply(mv2, projection);
 
         OpenTK.Vector4 testPoint2 = LeftMultiply(OpenTK.Vector3.One, mvp);
         testPoint2 /= testPoint2.W;
@@ -334,7 +338,9 @@ void main(void)
         OpenGLMgr.ClearGLError();
         //GL.UniformMatrix4(m_locMVP, false, ref mvp);
 
+
         GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
+
 
         OpenGLMgr.CheckGLError();
         GL.UniformMatrix4(m_locMV, false, ref mv);
@@ -371,6 +377,13 @@ void main(void)
         finalRet = tmp * ret;
 
         return finalRet;
+    }
+
+    public static OpenTK.Matrix4 Multiply(OpenTK.Matrix4 lhs, OpenTK.Matrix4 rhs)
+    {
+        Matrix4x4 t1 = ConvertOpenTkMatrixToUnityMatrix(lhs);
+        Matrix4x4 t2 = ConvertOpenTkMatrixToUnityMatrix(rhs);
+        return ConvertUnityMatrixToOpenTkMatrix(t1 * t2);
     }
 
     public static OpenTK.Vector4 LeftMultiply(OpenTK.Vector3 tmp, OpenTK.Matrix4 mat)
@@ -510,31 +523,31 @@ void main(void)
         return ret;
     }
 
-//      float[] ConverToFloat(Matrix4x4 mat)
-//      {
-//          float[] ret = new float[16];
-//          ret[0] = mat.m00;
-//          ret[1] = mat.m01;
-//          ret[2] = mat.m02;
-//          ret[3] = mat.m03;
-//  
-//          ret[4] = mat.m10;
-//          ret[5] = mat.m11;
-//          ret[6] = mat.m12;
-//          ret[7] = mat.m13;
-//  
-//          ret[8] = mat.m20;
-//          ret[9] = mat.m21;
-//          ret[10] = mat.m22;
-//          ret[11] = mat.m23;
-//  
-//          ret[12] = mat.m30;
-//          ret[13] = mat.m31;
-//          ret[14] = mat.m32;
-//          ret[15] = mat.m33;
-//  
-//          return ret;
-//      }
+    float[] ConverToFloat(Matrix4x4 mat)
+    {
+        float[] ret = new float[16];
+        ret[0] = mat.m00;
+        ret[1] = mat.m01;
+        ret[2] = mat.m02;
+        ret[3] = mat.m03;
+
+        ret[4] = mat.m10;
+        ret[5] = mat.m11;
+        ret[6] = mat.m12;
+        ret[7] = mat.m13;
+
+        ret[8] = mat.m20;
+        ret[9] = mat.m21;
+        ret[10] = mat.m22;
+        ret[11] = mat.m23;
+
+        ret[12] = mat.m30;
+        ret[13] = mat.m31;
+        ret[14] = mat.m32;
+        ret[15] = mat.m33;
+
+        return ret;
+      }
 
 //      float[] ConverToFloat3(Matrix4x4 mat)
 //      {
@@ -562,30 +575,57 @@ void main(void)
 //          return ret;
 //      }
 
-//     OpenTK.Matrix4 ConverToFloat2(Matrix4x4 mat)
-//     {
-//         OpenTK.Matrix4 ret = new OpenTK.Matrix4();
-//         ret.M11 = mat.m00;
-//         ret.M12 = mat.m01;
-//         ret.M13 = mat.m02;
-//         ret.M14 = mat.m03;
-// 
-//         ret.M21 = mat.m10;
-//         ret.M22 = mat.m11;
-//         ret.M23 = mat.m12;
-//         ret.M24 = mat.m13;
-// 
-//         ret.M31 = mat.m20;
-//         ret.M32 = mat.m21;
-//         ret.M33 = mat.m22;
-//         ret.M34 = mat.m23;
-// 
-//         ret.M41 = mat.m30;
-//         ret.M42 = mat.m31;
-//         ret.M43 = mat.m32;
-//         ret.M44 = mat.m33;
-// 
-//         return ret;
-//     }
+    static OpenTK.Matrix4 ConvertUnityMatrixToOpenTkMatrix(Matrix4x4 mat)
+    {
+        OpenTK.Matrix4 ret = new OpenTK.Matrix4();
+        ret.M11 = mat.m00;
+        ret.M12 = mat.m01;
+        ret.M13 = mat.m02;
+        ret.M14 = mat.m03;
+
+        ret.M21 = mat.m10;
+        ret.M22 = mat.m11;
+        ret.M23 = mat.m12;
+        ret.M24 = mat.m13;
+
+        ret.M31 = mat.m20;
+        ret.M32 = mat.m21;
+        ret.M33 = mat.m22;
+        ret.M34 = mat.m23;
+
+        ret.M41 = mat.m30;
+        ret.M42 = mat.m31;
+        ret.M43 = mat.m32;
+        ret.M44 = mat.m33;
+
+        return ret;
+     }
+
+    static Matrix4x4 ConvertOpenTkMatrixToUnityMatrix(OpenTK.Matrix4 ret)
+    {
+        Matrix4x4 mat = new Matrix4x4();
+
+        mat.m00 = ret.M11;
+        mat.m01 = ret.M12;
+        mat.m02 = ret.M13;
+        mat.m03 = ret.M14;
+
+        mat.m10 = ret.M21;
+        mat.m11 = ret.M22;
+        mat.m12 = ret.M23;
+        mat.m13 = ret.M24;
+
+        mat.m20 = ret.M31;
+        mat.m21 = ret.M32;
+        mat.m22 = ret.M33;
+        mat.m23 = ret.M34;
+
+        mat.m30 = ret.M41;
+        mat.m31 = ret.M42;
+        mat.m32 = ret.M43;
+        mat.m33 = ret.M44;
+
+        return mat;
+    }
 }
 
