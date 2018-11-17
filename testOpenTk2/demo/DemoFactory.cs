@@ -17,6 +17,7 @@ public enum DemoType
     PBODemo,
     FBOAndRBODemo,
     ADSLightDemo,
+    DeferredShadingDemo,
 }
 
 public interface IDemo
@@ -68,6 +69,10 @@ class DemoFactory
         else if (DemoConfig.m_demoType == DemoType.ADSLightDemo)
         {
             return new ADSLightDemo();
+        }
+        else if(DemoConfig.m_demoType == DemoType.DeferredShadingDemo)
+        {
+            return new DeferredShadingDemo();
         }
         else
         {

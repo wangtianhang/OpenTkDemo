@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="demo\ADSLightDemo.cs" />
+    <Compile Include="demo\DeferredShadingDemo.cs" />
     <Compile Include="demo\DemoConfig.cs" />
     <Compile Include="demo\DemoFactory.cs" />
     <Compile Include="demo\FBOAndRBODemo.cs" />
