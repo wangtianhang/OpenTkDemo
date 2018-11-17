@@ -450,6 +450,41 @@ void main(void)
         return worldToLocal;
     }
 
+    /// <summary>
+    /// 等价于UnityWorldToCameraMatrix
+    /// </summary>
+    /// <param name="eye"></param>
+    /// <param name="target"></param>
+    /// <param name="up"></param>
+    /// <returns></returns>
+    public static Matrix4x4 LookAt(Vector3 eye, Vector3 target, Vector3 up)
+    {
+        Vector3 z = (eye - target).normalized;
+        Vector3 x = Vector3.Cross(z, up).normalized;
+        Vector3 y = Vector3.Cross(x, z).normalized;
+
+        Matrix4x4 result = new Matrix4x4();
+
+        result[0] = x.x;
+        result[4] = x.y;
+        result[8] = x.z;
+        result[12] = -Vector3.Dot(x, eye);
+
+        result[1] = y.x;
+        result[5] = y.y;
+        result[9] = y.z;
+        result[13] = -Vector3.Dot(y, eye);
+
+        result[2] = z.x;
+        result[6] = z.y;
+        result[10] = z.z;
+        result[14] = -Vector3.Dot(z, eye);
+
+        result[3] = result[7] = result[11] = 0.0f;
+        result[15] = 1.0f;
+        return result;
+    }
+
     float[] ConverToFloat(OpenTK.Matrix4 mat)
     {
         float[] ret = new float[16];
