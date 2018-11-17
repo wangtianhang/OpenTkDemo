@@ -81,7 +81,7 @@ void main(void)
     // Specular Light
     vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir), normalize(vVaryingNormal)));
     float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
-    if(diff != 0f) {
+    if(diff != 0.0f) {
         float fSpec = pow(spec, 128.0);
         vFragColor.rgb += vec3(fSpec, fSpec, fSpec);
         }
@@ -294,9 +294,20 @@ void main(void)
 
         m_accTime += e.Time;
 
-        //Matrix4x4 model = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        //Matrix4x4 cameraLocalToWorld = Matrix4x4.TRS(new Vector3(-2.36f, 4.47f, -4.57f), Quaternion.Euler(45, 0, 0), Vector3.one);
-        //Matrix4x4 view = worldToCameraMatrix(cameraLocalToWorld);
+        Matrix4x4 modelUnity = Matrix4x4.TRS(Vector3.one, Quaternion.identity, Vector3.one);
+        Transform cameraTrans = new Transform();
+        cameraTrans.position = new Vector3(10, 10, 10);
+        cameraTrans.forward = Vector3.zero - cameraTrans.position;
+        Matrix4x4 cameraLocalToWorld = cameraTrans.localToWorldMatrix;
+        Matrix4x4 viewUnity = UnityWorldToCameraMatrix(cameraLocalToWorld);
+        Matrix4x4 projectionUnity = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
+        Matrix4x4 mvUnity = modelUnity * viewUnity;
+        Matrix4x4 mvpUnity = projectionUnity * viewUnity * modelUnity;
+
+        //Vector3 testPoint = Vector3.one;
+        Vector4 testPoint = mvpUnity.MultiplyPoint(Vector3.one); 
+        //Matrix4x4 cameraLocalToWorldUnity = Matrix4x4.TRS(new Vector3(10, 10, 10), Quaternion.Euler(45, 0, 0), Vector3.one);
+        //Matrix4x4 view = UnityWorldToCameraMatrix(cameraLocalToWorld);
         //Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
         //Matrix4x4 mv = view * model;
         //Matrix4x4 mvp = projection * view * model;
@@ -310,6 +321,9 @@ void main(void)
         //  坑死。。opengl变换从左往右乘
         OpenTK.Matrix4 mv = model * view;
         OpenTK.Matrix4 mvp = model * view * projection;
+
+        OpenTK.Vector4 testPoint2 = LeftMultiply(OpenTK.Vector3.One, mvp);
+        OpenTK.Vector4 testPoint3 = RightMultiply(mvp, OpenTK.Vector3.One);
 
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
@@ -354,21 +368,51 @@ void main(void)
         return finalRet;
     }
 
+    public static OpenTK.Vector4 LeftMultiply(OpenTK.Vector3 tmp, OpenTK.Matrix4 mat)
+    {
+        OpenTK.Vector4 vec = new OpenTK.Vector4(tmp);
+        vec.W = 1;
+
+        OpenTK.Vector4 ret = new OpenTK.Vector4();
+
+        ret.X = vec.X * mat.M11 + vec.Y * mat.M21 + vec.Z * mat.M31 + vec.W * mat.M41;
+        ret.Y = vec.X * mat.M12 + vec.Y * mat.M22 + vec.Z * mat.M32 + vec.W * mat.M42;
+        ret.Z = vec.X * mat.M13 + vec.Y * mat.M23 + vec.Z * mat.M33 + vec.W * mat.M43;
+        ret.W = vec.X * mat.M14 + vec.Y * mat.M24 + vec.Z * mat.M34 + vec.W * mat.M44;
+
+        return ret;
+    }
+
+    public static OpenTK.Vector4 RightMultiply(OpenTK.Matrix4 mat, OpenTK.Vector3 tmp)
+    {
+        OpenTK.Vector4 vec = new OpenTK.Vector4(tmp);
+        vec.W = 1;
+
+        OpenTK.Vector4 ret = new OpenTK.Vector4();
+
+        ret.X = mat.M11 * vec.X + mat.M12 * vec.Y + mat.M13 * vec.Z + mat.M14 * vec.W;
+        ret.Y = mat.M21 * vec.X + mat.M22 * vec.Y + mat.M23 * vec.Z + mat.M24 * vec.W;
+        ret.Z = mat.M31 * vec.X + mat.M32 * vec.Y + mat.M33 * vec.Z + mat.M34 * vec.W;
+
+        ret.W = mat.M41 * vec.X + mat.M42 * vec.Y + mat.M43 * vec.Z + mat.M44 * vec.W;
+        return ret;
+    }
+
 //     public static OpenTK.Matrix4 TRS(OpenTK.Matrix4 t, OpenTK.Matrix4 r, OpenTK.Matrix4 s)
 //     {
 //         return t * r * s;
 //     }
 
-//     public static OpenTK.Matrix4 worldToCameraMatrix(OpenTK.Matrix4 cameraLocalToWorld)
+//     public static Matrix4x4 UnityWorldToCameraMatrix(Matrix4x4 cameraLocalToWorld)
 //     {
-//         OpenTK.Matrix4 worldToLocal = new OpenTK.Matrix4();
-//         OpenTK.Matrix4.Invert(ref cameraLocalToWorld, out worldToLocal);
-// //         worldToLocal.M13 *= -1f;
-// //         worldToLocal.M23 *= -1f;
-// //         worldToLocal.M33 *= -1f;
-// //         worldToLocal.M34 *= -1f;
+//         Matrix4x4 worldToLocal = cameraLocalToWorld.inverse;
+//         //OpenTK.Matrix4.Invert(ref cameraLocalToWorld, out worldToLocal);
+//         worldToLocal.m20 *= -1f;
+//         worldToLocal.m21 *= -1f;
+//         worldToLocal.m22 *= -1f;
+//         worldToLocal.m23 *= -1f;
 //         return worldToLocal;
-//     }
+//      }
 
     public static OpenTK.Matrix4 Perspective(float fovy, float aspect, float n, float f)
     {
@@ -391,7 +435,7 @@ void main(void)
         return result;
     }
 
-    public static Matrix4x4 worldToCameraMatrix(Matrix4x4 cameraLocalToWorld)
+    public static Matrix4x4 UnityWorldToCameraMatrix(Matrix4x4 cameraLocalToWorld)
     {
         Matrix4x4 worldToLocal = cameraLocalToWorld.inverse;
         worldToLocal.m20 *= -1f;
