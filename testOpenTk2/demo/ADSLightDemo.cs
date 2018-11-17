@@ -305,7 +305,7 @@ void main(void)
         Matrix4x4 mvpUnity = projectionUnity * viewUnity * modelUnity;
 
         //Vector3 testPoint = Vector3.one;
-        Vector4 testPoint = mvpUnity.MultiplyPoint(Vector3.one); 
+        Vector4 testPoint = mvUnity.MultiplyPoint(Vector3.one); 
         //Matrix4x4 cameraLocalToWorldUnity = Matrix4x4.TRS(new Vector3(10, 10, 10), Quaternion.Euler(45, 0, 0), Vector3.one);
         //Matrix4x4 view = UnityWorldToCameraMatrix(cameraLocalToWorld);
         //Matrix4x4 projection = Matrix4x4.Perspective(60, m_width / (float)m_height, 0.1f, 100f);
@@ -324,6 +324,7 @@ void main(void)
 
         OpenTK.Vector4 testPoint2 = LeftMultiply(OpenTK.Vector3.One, mvp);
         OpenTK.Vector4 testPoint3 = RightMultiply(mvp, OpenTK.Vector3.One);
+        OpenTK.Vector4 testPoint4 = LeftMultiply(OpenTK.Vector3.One, mv);
 
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
@@ -349,15 +350,15 @@ void main(void)
 
     public static OpenTK.Matrix4 LookAt(OpenTK.Vector3 eye, OpenTK.Vector3 center, OpenTK.Vector3 up)
     {
-        OpenTK.Vector3 f = (center - eye).Normalized();
+        OpenTK.Vector3 forward = (center - eye).Normalized();
         OpenTK.Vector3 upN = up.Normalized();
-        OpenTK.Vector3 s = OpenTK.Vector3.Cross(f, upN);
-        OpenTK.Vector3 u = OpenTK.Vector3.Cross(s, f);
+        OpenTK.Vector3 right = OpenTK.Vector3.Cross(forward, upN).Normalized();
+        OpenTK.Vector3 u = OpenTK.Vector3.Cross(right, forward);
         OpenTK.Matrix4 ret = new OpenTK.Matrix4();
 
-        ret.M11 = s[0]; ret.M12 = u[0]; ret.M13 = -f[0]; ret.M14 = 0;
-        ret.M21 = s[1]; ret.M22 = u[1]; ret.M23 = -f[1]; ret.M24 = 0;
-        ret.M31 = s[2]; ret.M32 = u[2]; ret.M33 = -f[2]; ret.M34 = 0;
+        ret.M11 = right[0]; ret.M12 = u[0]; ret.M13 = -forward[0]; ret.M14 = 0;
+        ret.M21 = right[1]; ret.M22 = u[1]; ret.M23 = -forward[1]; ret.M24 = 0;
+        ret.M31 = right[2]; ret.M32 = u[2]; ret.M33 = -forward[2]; ret.M34 = 0;
         ret.M41 = 0; ret.M42 = 0; ret.M43 = 0; ret.M44 = 1;
 
         OpenTK.Matrix4 tmp = OpenTK.Matrix4.CreateTranslation(-eye);
