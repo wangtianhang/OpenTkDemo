@@ -62,14 +62,14 @@ void main(void)
 #version 300 es
 precision highp float;
 
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec2 a_texCoord;
+out vec2 v_texCoord;
+
 void main(void)
 {
-    const vec4 verts[4] = vec4[4](vec4(-1.0, -1.0, 0.5, 1.0),
-                                  vec4( 1.0, -1.0, 0.5, 1.0),
-                                  vec4(-1.0,  1.0, 0.5, 1.0),
-                                  vec4( 1.0,  1.0, 0.5, 1.0));
-
-    gl_Position = verts[gl_VertexID];
+    gl_Position = a_position;
+    v_texCoord = a_texCoord;
 }
 ";
 
@@ -90,6 +90,9 @@ void main(void)
     ivec2 coord = ivec2(gl_FragCoord.xy);
     vec4 data0 = texelFetch(gbuf_tex0, ivec2(coord), 0);
     vec4 data1 = texelFetch(gbuf_tex1, ivec2(coord), 0);
+
+vFragColor = data1;
+return;
 
     vec3 vVaryingNormal = data0.xyz;
     vec3 vVaryingLightDir = data1.xyz;
@@ -119,7 +122,7 @@ void main(void)
     public int m_prePassProgram;
     public int m_lightPassProgram;
     public OpenGLHelper.MeshData m_meshData;
-    IntPtr m_ptr;
+    IntPtr m_ptrCube;
     
     int m_width;
     int m_height;
@@ -134,19 +137,31 @@ void main(void)
     int m_locAmbient;			// The location of the ambient color
     int m_locDiffuse;			// The location of the diffuse color
 
-    int fs_quad_vao;
+    //int fs_quad_vao;
+    IntPtr m_ptrQuad;
+    ushort[] m_quadIndices = { 0, 1, 2, 0, 2, 3 };
 
     public void Init(MainWindow mainWindow)
     {
         m_prePassProgram = OpenGLHelper._CompilerShader(prePassVShader, prePassFShader);
         m_lightPassProgram = OpenGLHelper._CompilerShader(lightPassVShader, lightPassFShader);
         m_meshData = OpenGLHelper.GetCubeMesh();
-        m_ptr = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
-        Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
+        m_ptrCube = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
+        Marshal.Copy(m_meshData.m_data, 0, m_ptrCube, m_meshData.m_data.Length);
         m_width = mainWindow.Width;
         m_height = mainWindow.Height;
 
-
+        float[] vVertices = new float[] { -0.5f,  0.5f, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0 
+                        -0.5f, -0.5f, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.5f, -0.5f, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.5f,  0.5f, 0.0f,  // Position 3
+                        1.0f,  0.0f         // TexCoord 3
+                        };
+        m_ptrQuad = Marshal.AllocHGlobal(sizeof(float) * vVertices.Length);
+        Marshal.Copy(vVertices, 0, m_ptrQuad, vVertices.Length);
 
         m_gbuffer = GL.GenFramebuffer();
         GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
@@ -183,8 +198,8 @@ void main(void)
         m_locDiffuse = GL.GetUniformLocation(m_lightPassProgram, "diffuseColor");
         Debug.Log("m_locDiffuse" + m_locDiffuse);
 
-        fs_quad_vao = GL.GenVertexArray();
-        GL.BindVertexArray(fs_quad_vao);
+        //fs_quad_vao = GL.GenVertexArray();
+        //GL.BindVertexArray(fs_quad_vao);
     }
 
     public void OnUpdateFrame(OpenTK.FrameEventArgs e)
@@ -194,12 +209,19 @@ void main(void)
 
     public void OnRenderFrame(OpenTK.FrameEventArgs e)
     {
-        float[] float_zeros = new float[]{ 0.0f, 0.0f, 0.0f, 0.0f };
-        float[] float_ones = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
+        DrawCube();
+
+        DrawQuad();
+    }
+
+    void DrawCube()
+    {
+        float[] float_zeros = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
+        float[] float_ones = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
 
         GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
-        //GL.Viewport(0, 0, m_width, m_height);
-        All[] draw_buffers = new All[] {All.ColorAttachment0, All.ColorAttachment1 };
+        GL.Viewport(0, 0, m_width, m_height);
+        All[] draw_buffers = new All[] { All.ColorAttachment0, All.ColorAttachment1 };
         GL.DrawBuffers(2, draw_buffers);
         GL.ClearBuffer(All.Color, 0, float_zeros);
         GL.ClearBuffer(All.Color, 1, float_zeros);
@@ -216,8 +238,8 @@ void main(void)
         const int POS_SIZE = 3;
         const int NORMAL_SIZE = 3;
 
-        GL.VertexAttribPointer(POS_INDEX, POS_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptr);
-        GL.VertexAttribPointer(NORMAL_INDEX, NORMAL_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptr + sizeof(float) * POS_SIZE);
+        GL.VertexAttribPointer(POS_INDEX, POS_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptrCube);
+        GL.VertexAttribPointer(NORMAL_INDEX, NORMAL_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptrCube + sizeof(float) * POS_SIZE);
 
         GL.EnableVertexAttribArray(POS_INDEX);
         GL.EnableVertexAttribArray(NORMAL_INDEX);
@@ -245,6 +267,17 @@ void main(void)
         GL.DisableVertexAttribArray(NORMAL_INDEX);
 
         GL.BindFramebuffer(All.Framebuffer, 0);
+
+        GL.Disable(EnableCap.DepthTest);
+        GL.Disable(EnableCap.CullFace);
+    }
+
+    void DrawQuad()
+    {
+        float[] black = new float[] { 0, 0, 0, 1 };
+        GL.ClearBuffer(ClearBuffer.Color, 0, black);
+
+        GL.Viewport(0, 0, m_width, m_height);
         //GL.DrawBuffer(All.Back);
 
         GL.ActiveTexture(All.Texture0);
@@ -260,11 +293,20 @@ void main(void)
         GL.Uniform4(m_locAmbient, 1, vAmbientColor);
         GL.Uniform4(m_locDiffuse, 1, vDiffuseColor);
 
-        GL.Disable(EnableCap.DepthTest);
+        //GL.BindVertexArray(fs_quad_vao);
+        //GL.DrawArrays(All.TriangleStrip, 0, 4);
+        const int POS_INDEX = 0;
+        const int UV_INDEX = 1;
+        const int POS_SIZE = 3;
+        const int UV_SIZE = 2;
 
-        GL.BindVertexArray(fs_quad_vao);
-        GL.DrawArrays(All.TriangleStrip, 0, 4);
+        GL.EnableVertexAttribArray(POS_INDEX);
+        GL.EnableVertexAttribArray(UV_INDEX);
 
+        GL.DrawElements(PrimitiveType.Triangles, m_quadIndices.Length, DrawElementsType.UnsignedShort, m_quadIndices);
+
+        GL.DisableVertexAttribArray(POS_INDEX);
+        GL.DisableVertexAttribArray(UV_INDEX);
     }
 }
 
