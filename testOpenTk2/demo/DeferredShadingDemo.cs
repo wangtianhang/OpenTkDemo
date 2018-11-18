@@ -157,17 +157,17 @@ void main(void)
         m_width = mainWindow.Width;
         m_height = mainWindow.Height;
 
-        float[] vVertices = new float[] { -0.5f,  0.5f, 0.0f,  // Position 0
+        float[] quadVertices = new float[] { -1f,  1f, 0.0f,  // Position 0
                         0.0f,  0.0f,        // TexCoord 0 
-                        -0.5f, -0.5f, 0.0f,  // Position 1
+                        -1f, -1f, 0.0f,  // Position 1
                         0.0f,  1.0f,        // TexCoord 1
-                        0.5f, -0.5f, 0.0f,  // Position 2
+                        1f, -1f, 0.0f,  // Position 2
                         1.0f,  1.0f,        // TexCoord 2
-                        0.5f,  0.5f, 0.0f,  // Position 3
+                        1f,  1f, 0.0f,  // Position 3
                         1.0f,  0.0f         // TexCoord 3
                         };
-        m_ptrQuad = Marshal.AllocHGlobal(sizeof(float) * vVertices.Length);
-        Marshal.Copy(vVertices, 0, m_ptrQuad, vVertices.Length);
+        m_ptrQuad = Marshal.AllocHGlobal(sizeof(float) * quadVertices.Length);
+        Marshal.Copy(quadVertices, 0, m_ptrQuad, quadVertices.Length);
 
         m_gbuffer = GL.GenFramebuffer();
         GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
