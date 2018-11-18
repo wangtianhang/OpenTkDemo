@@ -87,11 +87,11 @@ void main(void)
         }
     }
 ";
-    public class MeshData
-    {
-        public float[] m_data;
-        public ushort[] m_index;
-    }
+//     public class MeshData
+//     {
+//         public float[] m_data;
+//         public ushort[] m_index;
+//     }
 
     public int m_program;
 
@@ -103,7 +103,7 @@ void main(void)
     int m_locMV;				// The location of the ModelView matrix uniform
     //int m_locNM;				// The location of the Normal matrix uniform
 
-    public MeshData m_meshData;
+    public OpenGLHelper.MeshData m_meshData;
     IntPtr m_ptr;
 
     int m_width;
@@ -113,9 +113,9 @@ void main(void)
 
     public void Init(MainWindow mainWindow)
     {
-        m_program = OpenGLMgr._CompilerShader(vShaderStr, fShaderStr);
+        m_program = OpenGLHelper._CompilerShader(vShaderStr, fShaderStr);
 
-        m_meshData = GetCubeMesh();
+        m_meshData = OpenGLHelper.GetCubeMesh();
 
         m_ptr = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
         Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
@@ -124,10 +124,10 @@ void main(void)
         GL.DepthFunc(All.Lequal);
         GL.Enable(EnableCap.CullFace);
 
-        OpenGLMgr.ClearGLError();
+        OpenGLHelper.ClearGLError();
         m_locAmbient = GL.GetUniformLocation(m_program, "ambientColor");
         Debug.Log("m_locAmbient" + m_locAmbient);
-        OpenGLMgr.CheckGLError();
+        OpenGLHelper.CheckGLError();
         m_locDiffuse = GL.GetUniformLocation(m_program, "diffuseColor");
         Debug.Log("m_locDiffuse" + m_locDiffuse);
         m_locSpecular = GL.GetUniformLocation(m_program, "specularColor");
@@ -144,117 +144,117 @@ void main(void)
         m_height = mainWindow.Height;
     }
 
-    MeshData GetCubeMesh()
-    {
-        List<Vector3> vertices = new List<Vector3>();
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-
-
-        List<ushort> index = new List<ushort>();
-        index.Add(0);
-        index.Add(2);
-        index.Add(3);
-        index.Add(0);
-        index.Add(3);
-        index.Add(1);
-        index.Add(8);
-        index.Add(4);
-        index.Add(5);
-        index.Add(8);
-        index.Add(5);
-        index.Add(9);
-        index.Add(10);
-        index.Add(6);
-        index.Add(7);
-        index.Add(10);
-        index.Add(7);
-        index.Add(11);
-        index.Add(12);
-        index.Add(13);
-        index.Add(14);
-        index.Add(12);
-        index.Add(14);
-        index.Add(15);
-        index.Add(16);
-        index.Add(17);
-        index.Add(18);
-        index.Add(16);
-        index.Add(18);
-        index.Add(19);
-        index.Add(20);
-        index.Add(21);
-        index.Add(22);
-        index.Add(20);
-        index.Add(22);
-        index.Add(23);
-
-
-        List<Vector3> normals = new List<Vector3>();
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-
-        MeshData meshData = new MeshData();
-        List<float> dataList = new List<float>();
-        for (int i = 0; i < vertices.Count; ++i )
-        {
-            Vector3 pos = vertices[i];
-            Vector3 normal = normals[i];
-            dataList.Add(pos.x);
-            dataList.Add(pos.y);
-            dataList.Add(pos.z);
-            dataList.Add(normal.x);
-            dataList.Add(normal.y);
-            dataList.Add(normal.z);
-        }
-        meshData.m_data = dataList.ToArray();
-        meshData.m_index = index.ToArray();
-        return meshData;
-    }
+//     MeshData GetCubeMesh()
+//     {
+//         List<Vector3> vertices = new List<Vector3>();
+//         vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
+//         vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
+//         vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
+// 
+// 
+//         List<ushort> index = new List<ushort>();
+//         index.Add(0);
+//         index.Add(2);
+//         index.Add(3);
+//         index.Add(0);
+//         index.Add(3);
+//         index.Add(1);
+//         index.Add(8);
+//         index.Add(4);
+//         index.Add(5);
+//         index.Add(8);
+//         index.Add(5);
+//         index.Add(9);
+//         index.Add(10);
+//         index.Add(6);
+//         index.Add(7);
+//         index.Add(10);
+//         index.Add(7);
+//         index.Add(11);
+//         index.Add(12);
+//         index.Add(13);
+//         index.Add(14);
+//         index.Add(12);
+//         index.Add(14);
+//         index.Add(15);
+//         index.Add(16);
+//         index.Add(17);
+//         index.Add(18);
+//         index.Add(16);
+//         index.Add(18);
+//         index.Add(19);
+//         index.Add(20);
+//         index.Add(21);
+//         index.Add(22);
+//         index.Add(20);
+//         index.Add(22);
+//         index.Add(23);
+// 
+// 
+//         List<Vector3> normals = new List<Vector3>();
+//         normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
+//         normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
+//         normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
+//         normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
+//         normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
+//         normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
+//         normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
+//         normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
+// 
+//         MeshData meshData = new MeshData();
+//         List<float> dataList = new List<float>();
+//         for (int i = 0; i < vertices.Count; ++i )
+//         {
+//             Vector3 pos = vertices[i];
+//             Vector3 normal = normals[i];
+//             dataList.Add(pos.x);
+//             dataList.Add(pos.y);
+//             dataList.Add(pos.z);
+//             dataList.Add(normal.x);
+//             dataList.Add(normal.y);
+//             dataList.Add(normal.z);
+//         }
+//         meshData.m_data = dataList.ToArray();
+//         meshData.m_index = index.ToArray();
+//         return meshData;
+//     }
 
     public void OnUpdateFrame(OpenTK.FrameEventArgs e)
     {
@@ -337,14 +337,14 @@ void main(void)
         //UnityEngine.Debug.Log(mvp.ToString());
         //OpenTK.Matrix4 mvp2 = ConverToFloat2(mvp);
         //OpenTK.Matrix4 mv2 = ConverToFloat2(mv);
-        OpenGLMgr.ClearGLError();
+        OpenGLHelper.ClearGLError();
         //GL.UniformMatrix4(m_locMVP, false, ref mvp);
 
 
         GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
 
 
-        OpenGLMgr.CheckGLError();
+        OpenGLHelper.CheckGLError();
         GL.UniformMatrix4(m_locMV, false, ref mv);
         //GL.UniformMatrix4(m_locMVP, 1, false, ConverToFloat(mvp));
         //GL.UniformMatrix4(m_locMV, 1, false, ConverToFloat(mv));

@@ -87,7 +87,7 @@
     <Compile Include="unity\inner\GoManager.cs" />
     <Compile Include="unity\inner\MonoManager.cs" />
     <Compile Include="unity\obj\Texture.cs" />
-    <Compile Include="unity\render\OpenGLMgr.cs" />
+    <Compile Include="unity\render\OpenGLHelper.cs" />
     <Compile Include="unity\render\RenderMgr.cs" />
     <Compile Include="unity\inner\SceneMgr.cs" />
     <Compile Include="unity\obj\Material.cs" />

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.ES30;
+using System.Runtime.InteropServices;
 
 class DeferredShadingDemo : IDemo
 {
@@ -119,19 +120,53 @@ void main(void)
 
 ";
 
-    public class MeshData
-    {
-        public float[] m_data;
-        public ushort[] m_index;
-    }
-
     public int m_prePassProgram;
     public int m_lightPassProgram;
+    public OpenGLHelper.MeshData m_meshData;
+    IntPtr m_ptr;
+    
+    int m_width;
+    int m_height;
+
+    int m_gbuffer;
+    int[] m_gbuffer_tex = new int[3];
 
     public void Init(MainWindow mainWindow)
     {
-        m_prePassProgram = OpenGLMgr._CompilerShader(prePassVShader, prePassFShader);
-        m_lightPassProgram = OpenGLMgr._CompilerShader(lightPassVShader, lightPassFShader);
+        m_prePassProgram = OpenGLHelper._CompilerShader(prePassVShader, prePassFShader);
+        m_lightPassProgram = OpenGLHelper._CompilerShader(lightPassVShader, lightPassFShader);
+        m_meshData = OpenGLHelper.GetCubeMesh();
+        m_ptr = Marshal.AllocHGlobal(sizeof(float) * m_meshData.m_data.Length);
+        Marshal.Copy(m_meshData.m_data, 0, m_ptr, m_meshData.m_data.Length);
+        m_width = mainWindow.Width;
+        m_height = mainWindow.Height;
+
+        GL.Enable(EnableCap.DepthTest);
+        GL.DepthFunc(All.Lequal);
+        GL.Enable(EnableCap.CullFace);
+
+        m_gbuffer = GL.GenFramebuffer();
+        GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
+        GL.GenTextures(3, m_gbuffer_tex);
+
+        GL.BindTexture(All.Texture2D, m_gbuffer_tex[0]);
+        GL.TexStorage2D(All.Texture2D, 1, All.Rgba32f, m_width, m_height);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+
+        GL.BindTexture(All.Texture2D, m_gbuffer_tex[1]);
+        GL.TexStorage2D(All.Texture2D, 1, All.Rgba32f, m_width, m_height);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+
+        GL.BindTexture(All.Texture2D, m_gbuffer_tex[2]);
+        GL.TexStorage2D(All.Texture2D, 1, All.DepthComponent32f, m_width, m_height);
+
+        GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget2d.Texture2D, m_gbuffer_tex[0], 0);
+        GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1, TextureTarget2d.Texture2D, m_gbuffer_tex[1], 0);
+        GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget2d.Texture2D, m_gbuffer_tex[2], 0);
+
+        GL.BindFramebuffer(All.Framebuffer, 0);
     }
 
     public void OnUpdateFrame(OpenTK.FrameEventArgs e)
@@ -141,119 +176,33 @@ void main(void)
 
     public void OnRenderFrame(OpenTK.FrameEventArgs e)
     {
+        float[] black = new float[] { 0, 0, 0, 1 };
+        GL.ClearBuffer(ClearBuffer.Color, 0, black);
+        float[] ones = new float[] { 1.0f };
+        GL.ClearBuffer(ClearBuffer.Depth, 0, ones);
 
+        GL.UseProgram(m_prePassProgram);
+
+        const int POS_INDEX = 0;
+        const int NORMAL_INDEX = 1;
+        const int POS_SIZE = 3;
+        const int NORMAL_SIZE = 3;
+
+        GL.VertexAttribPointer(POS_INDEX, POS_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptr);
+        GL.VertexAttribPointer(NORMAL_INDEX, NORMAL_SIZE, All.Float, false, (POS_SIZE + NORMAL_SIZE) * sizeof(float), m_ptr + sizeof(float) * POS_SIZE);
+
+        GL.EnableVertexAttribArray(POS_INDEX);
+        GL.EnableVertexAttribArray(NORMAL_INDEX);
+
+        float[] vEyeLight = { -100.0f, 100.0f, 100.0f };
+
+
+        float[] vAmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+        float[] vDiffuseColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+        GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
     }
 
-    MeshData GetCubeMesh()
-    {
-        List<Vector3> vertices = new List<Vector3>();
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
 
-
-        List<ushort> index = new List<ushort>();
-        index.Add(0);
-        index.Add(2);
-        index.Add(3);
-        index.Add(0);
-        index.Add(3);
-        index.Add(1);
-        index.Add(8);
-        index.Add(4);
-        index.Add(5);
-        index.Add(8);
-        index.Add(5);
-        index.Add(9);
-        index.Add(10);
-        index.Add(6);
-        index.Add(7);
-        index.Add(10);
-        index.Add(7);
-        index.Add(11);
-        index.Add(12);
-        index.Add(13);
-        index.Add(14);
-        index.Add(12);
-        index.Add(14);
-        index.Add(15);
-        index.Add(16);
-        index.Add(17);
-        index.Add(18);
-        index.Add(16);
-        index.Add(18);
-        index.Add(19);
-        index.Add(20);
-        index.Add(21);
-        index.Add(22);
-        index.Add(20);
-        index.Add(22);
-        index.Add(23);
-
-
-        List<Vector3> normals = new List<Vector3>();
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, 1.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, 0.0f, -1.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(0.0f, -1.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(-1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-        normals.Add(new Vector3(1.0f, 0.0f, 0.0f));
-
-        MeshData meshData = new MeshData();
-        List<float> dataList = new List<float>();
-        for (int i = 0; i < vertices.Count; ++i)
-        {
-            Vector3 pos = vertices[i];
-            Vector3 normal = normals[i];
-            dataList.Add(pos.X);
-            dataList.Add(pos.Y);
-            dataList.Add(pos.Z);
-            dataList.Add(normal.X);
-            dataList.Add(normal.Y);
-            dataList.Add(normal.Z);
-        }
-        meshData.m_data = dataList.ToArray();
-        meshData.m_index = index.ToArray();
-        return meshData;
-    }
 }
 

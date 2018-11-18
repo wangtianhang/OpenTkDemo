@@ -42,7 +42,7 @@ void main(void)
     {
         m_mainWindow = mainWindow;
 
-        m_renderPorgram = OpenGLMgr._CompilerShader(m_vertexShaderSrc, m_pixelShaderSrc);
+        m_renderPorgram = OpenGLHelper._CompilerShader(m_vertexShaderSrc, m_pixelShaderSrc);
         m_vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(m_vertexArrayObject);
     }

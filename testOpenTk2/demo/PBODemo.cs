@@ -48,7 +48,7 @@ void main()
 
     public void Init(MainWindow mainWindow)
     {
-        m_program = OpenGLMgr._CompilerShader(vShaderStr, fShaderStr);
+        m_program = OpenGLHelper._CompilerShader(vShaderStr, fShaderStr);
 
         m_textureId = CreateSimpleTexture2D();
 
