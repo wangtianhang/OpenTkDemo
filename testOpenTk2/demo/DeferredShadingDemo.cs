@@ -10,7 +10,7 @@ using UnityEngine;
 class DeferredShadingDemo : IDemo
 {
     public string prePassVShader = @"
-#version 430 core
+#version 300 es
 precision highp float;
 
 // Incoming per vertex... position and normal
@@ -43,7 +43,7 @@ void main(void)
     }
 ";
     public string prePassFShader = @"
-#version 430 core
+#version 300 es
 precision highp float;
 
 in vec3 vVaryingNormal;
@@ -61,7 +61,7 @@ void main(void)
     }
 ";
     public string lightPassVShader = @"
-#version 430 core
+#version 300 es
 precision highp float;
 
 layout(location = 0) in vec4 a_position;
@@ -76,7 +76,7 @@ void main(void)
 ";
 
     public string lightPassFShader = @"
-#version 430 core
+#version 300 es
 precision highp float;
 
 out vec4 vFragColor;
