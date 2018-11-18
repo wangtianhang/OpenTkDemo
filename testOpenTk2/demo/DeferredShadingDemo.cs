@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK;
 using OpenTK.Graphics.ES30;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 class DeferredShadingDemo : IDemo
 {
@@ -45,10 +45,6 @@ void main(void)
     public string prePassFShader = @"
 #version 300 es
 precision highp float;
-
-uniform vec4    ambientColor;
-uniform vec4    diffuseColor; 
-uniform vec4 specularColor;
 
 in vec3 vVaryingNormal;
 in vec3 vVaryingLightDir;
@@ -131,6 +127,15 @@ void main(void)
     int m_gbuffer;
     int[] m_gbuffer_tex = new int[3];
 
+    int m_locLight;
+    int m_locMVP;
+    int m_locMV;
+
+    int m_locAmbient;			// The location of the ambient color
+    int m_locDiffuse;			// The location of the diffuse color
+
+    int fs_quad_vao;
+
     public void Init(MainWindow mainWindow)
     {
         m_prePassProgram = OpenGLHelper._CompilerShader(prePassVShader, prePassFShader);
@@ -141,9 +146,7 @@ void main(void)
         m_width = mainWindow.Width;
         m_height = mainWindow.Height;
 
-        GL.Enable(EnableCap.DepthTest);
-        GL.DepthFunc(All.Lequal);
-        GL.Enable(EnableCap.CullFace);
+
 
         m_gbuffer = GL.GenFramebuffer();
         GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
@@ -167,6 +170,21 @@ void main(void)
         GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget2d.Texture2D, m_gbuffer_tex[2], 0);
 
         GL.BindFramebuffer(All.Framebuffer, 0);
+
+        m_locLight = GL.GetUniformLocation(m_prePassProgram, "vLightPosition");
+        Debug.Log("m_locLight" + m_locLight);
+        m_locMVP = GL.GetUniformLocation(m_prePassProgram, "mvpMatrix");
+        Debug.Log("m_locMVP" + m_locMVP);
+        m_locMV = GL.GetUniformLocation(m_prePassProgram, "mvMatrix");
+        Debug.Log("m_locMV" + m_locMV);
+
+        m_locAmbient = GL.GetUniformLocation(m_lightPassProgram, "ambientColor");
+        Debug.Log("m_locAmbient" + m_locAmbient);
+        m_locDiffuse = GL.GetUniformLocation(m_lightPassProgram, "diffuseColor");
+        Debug.Log("m_locDiffuse" + m_locDiffuse);
+
+        fs_quad_vao = GL.GenVertexArray();
+        GL.BindVertexArray(fs_quad_vao);
     }
 
     public void OnUpdateFrame(OpenTK.FrameEventArgs e)
@@ -176,10 +194,20 @@ void main(void)
 
     public void OnRenderFrame(OpenTK.FrameEventArgs e)
     {
-        float[] black = new float[] { 0, 0, 0, 1 };
-        GL.ClearBuffer(ClearBuffer.Color, 0, black);
-        float[] ones = new float[] { 1.0f };
-        GL.ClearBuffer(ClearBuffer.Depth, 0, ones);
+        float[] float_zeros = new float[]{ 0.0f, 0.0f, 0.0f, 0.0f };
+        float[] float_ones = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+        GL.BindFramebuffer(All.Framebuffer, m_gbuffer);
+        //GL.Viewport(0, 0, m_width, m_height);
+        All[] draw_buffers = new All[] {All.ColorAttachment0, All.ColorAttachment1 };
+        GL.DrawBuffers(2, draw_buffers);
+        GL.ClearBuffer(All.Color, 0, float_zeros);
+        GL.ClearBuffer(All.Color, 1, float_zeros);
+        GL.ClearBuffer(All.Depth, 0, float_ones);
+        //float[] black = new float[] { 0, 0, 0, 1 };
+        //GL.ClearBuffer(ClearBuffer.Color, 0, black);
+        //float[] ones = new float[] { 1.0f };
+        //GL.ClearBuffer(ClearBuffer.Depth, 0, ones);
 
         GL.UseProgram(m_prePassProgram);
 
@@ -196,13 +224,47 @@ void main(void)
 
         float[] vEyeLight = { -100.0f, 100.0f, 100.0f };
 
+        OpenTK.Matrix4 model = OpenGLHelper.GLSRT(OpenTK.Vector3.One, OpenTK.Quaternion.Identity, OpenTK.Vector3.One);
+        OpenTK.Matrix4 view = OpenGLHelper.GLLookAt(new OpenTK.Vector3(10, 10, 10), OpenTK.Vector3.Zero, new OpenTK.Vector3(0, 1, 0));
+        OpenTK.Matrix4 projection = OpenGLHelper.GLPerspective(60, m_width / (float)m_height, 0.1f, 100f);
+
+        OpenTK.Matrix4 mv = OpenGLHelper.GLVMathMultiply(view, model);
+        OpenTK.Matrix4 mvp = OpenGLHelper.GLVMathMultiply(projection, mv);
+
+        GL.Uniform3(m_locLight, 1, vEyeLight);
+        GL.UniformMatrix4(m_locMVP, 1, false, OpenGLHelper.ConverToFloat(mvp));
+        GL.UniformMatrix4(m_locMV, false, ref mv);
+
+        GL.Enable(EnableCap.DepthTest);
+        GL.DepthFunc(All.Lequal);
+        GL.Enable(EnableCap.CullFace);
+
+        GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
+
+        GL.DisableVertexAttribArray(POS_INDEX);
+        GL.DisableVertexAttribArray(NORMAL_INDEX);
+
+        GL.BindFramebuffer(All.Framebuffer, 0);
+        //GL.DrawBuffer(All.Back);
+
+        GL.ActiveTexture(All.Texture0);
+        GL.BindTexture(All.Texture2D, m_gbuffer_tex[0]);
+        GL.ActiveTexture(All.Texture1);
+        GL.BindTexture(All.Texture2D, m_gbuffer_tex[1]);
+
+        GL.UseProgram(m_lightPassProgram);
 
         float[] vAmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
         float[] vDiffuseColor = { 0.0f, 0.0f, 1.0f, 1.0f };
 
-        GL.DrawElements(PrimitiveType.Triangles, m_meshData.m_index.Length, DrawElementsType.UnsignedShort, m_meshData.m_index);
+        GL.Uniform4(m_locAmbient, 1, vAmbientColor);
+        GL.Uniform4(m_locDiffuse, 1, vDiffuseColor);
+
+        GL.Disable(EnableCap.DepthTest);
+
+        GL.BindVertexArray(fs_quad_vao);
+        GL.DrawArrays(All.TriangleStrip, 0, 4);
+
     }
-
-
 }
 
