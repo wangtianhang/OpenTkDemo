@@ -10,7 +10,7 @@ using UnityEngine;
 class DeferredShadingDemo : IDemo
 {
     public string prePassVShader = @"
-#version 300 es
+#version 430 core
 precision highp float;
 
 // Incoming per vertex... position and normal
@@ -43,7 +43,7 @@ void main(void)
     }
 ";
     public string prePassFShader = @"
-#version 300 es
+#version 430 core
 precision highp float;
 
 in vec3 vVaryingNormal;
@@ -56,10 +56,12 @@ void main(void)
     {
         color0 = vec4(vVaryingNormal, 1);
         color1 = vec4(vVaryingLightDir, 1);
+        //color0 = vec4(1, 0, 0, 1);
+        //color1 = vec4(0, 0, 1, 1);
     }
 ";
     public string lightPassVShader = @"
-#version 300 es
+#version 430 core
 precision highp float;
 
 layout(location = 0) in vec4 a_position;
@@ -74,10 +76,10 @@ void main(void)
 ";
 
     public string lightPassFShader = @"
-#version 300 es
+#version 430 core
 precision highp float;
 
-layout (location = 0) out vec4 vFragColor;
+out vec4 vFragColor;
 
 uniform vec4    ambientColor;
 uniform vec4    diffuseColor; 
@@ -91,8 +93,9 @@ void main(void)
     vec4 data0 = texelFetch(gbuf_tex0, ivec2(coord), 0);
     vec4 data1 = texelFetch(gbuf_tex1, ivec2(coord), 0);
 
-vFragColor = data1;
-return;
+//vFragColor = data1;
+
+//return;
 
     vec3 vVaryingNormal = data0.xyz;
     vec3 vVaryingLightDir = data1.xyz;
@@ -140,6 +143,9 @@ return;
     //int fs_quad_vao;
     IntPtr m_ptrQuad;
     ushort[] m_quadIndices = { 0, 1, 2, 0, 2, 3 };
+
+    int m_locTex0;
+    int m_locTex1;
 
     public void Init(MainWindow mainWindow)
     {
@@ -198,6 +204,10 @@ return;
         m_locDiffuse = GL.GetUniformLocation(m_lightPassProgram, "diffuseColor");
         Debug.Log("m_locDiffuse" + m_locDiffuse);
 
+        m_locTex0 = GL.GetUniformLocation(m_lightPassProgram, "gbuf_tex0");
+        Debug.Log("m_locTex0" + m_locTex0);
+        m_locTex1 = GL.GetUniformLocation(m_lightPassProgram, "gbuf_tex1");
+        Debug.Log("m_locTex1" + m_locTex1);
         //fs_quad_vao = GL.GenVertexArray();
         //GL.BindVertexArray(fs_quad_vao);
     }
@@ -279,13 +289,19 @@ return;
 
         GL.Viewport(0, 0, m_width, m_height);
         //GL.DrawBuffer(All.Back);
+        GL.UseProgram(m_lightPassProgram);
+
+        OpenGLHelper.ClearGLError();
+        GL.Uniform1(m_locTex0, 0);
+        OpenGLHelper.CheckGLError();
+        GL.Uniform1(m_locTex1, 1);
 
         GL.ActiveTexture(All.Texture0);
         GL.BindTexture(All.Texture2D, m_gbuffer_tex[0]);
+
         GL.ActiveTexture(All.Texture1);
         GL.BindTexture(All.Texture2D, m_gbuffer_tex[1]);
 
-        GL.UseProgram(m_lightPassProgram);
 
         float[] vAmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
         float[] vDiffuseColor = { 0.0f, 0.0f, 1.0f, 1.0f };
@@ -302,6 +318,15 @@ return;
 
         GL.EnableVertexAttribArray(POS_INDEX);
         GL.EnableVertexAttribArray(UV_INDEX);
+
+        GL.VertexAttribPointer(POS_INDEX, POS_SIZE, All.Float, false, (POS_SIZE + UV_SIZE) * sizeof(float), m_ptrQuad);
+        GL.VertexAttribPointer(UV_INDEX, UV_SIZE, All.Float, false, (POS_SIZE + UV_SIZE) * sizeof(float), m_ptrQuad + sizeof(float) * POS_SIZE);
+
+
+
+        //OpenGLHelper.ClearGLError();
+        //GL.Uniform1(m_locTex1, m_gbuffer_tex[1]);
+        //OpenGLHelper.CheckGLError();
 
         GL.DrawElements(PrimitiveType.Triangles, m_quadIndices.Length, DrawElementsType.UnsignedShort, m_quadIndices);
 
